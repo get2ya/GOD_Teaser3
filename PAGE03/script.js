@@ -2,10 +2,16 @@
 (function() {
     const naverBtn = document.querySelector('.naver-btn');
     const video = document.querySelector('.logo-animation');
+    const bgGroup = document.querySelector('.background-group');
 
     if (!video) return;
 
     function startVideo() {
+        // 배경 페이드인
+        if (bgGroup) {
+            bgGroup.classList.add('visible');
+        }
+
         video.play().then(function() {
             video.classList.add('playing');
         }).catch(function(e) {

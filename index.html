@@ -55,12 +55,24 @@
         a:active {
             transform: translateY(0);
         }
+
+        a.disabled {
+            background: #1f1f1f;
+            color: #555;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        a.disabled:hover {
+            background: #1f1f1f;
+            transform: none;
+        }
     </style>
 </head>
 <body>
     <h1>GOD OF HIGHSCHOOL CHANGE - 티저 페이지</h1>
     <div class="links">
-        <a href="PAGE01/">PAGE01 - 스피닝 버전</a>
+        <span class="disabled" style="display: block; padding: 20px 60px; background: #1f1f1f; color: #555; border-radius: 8px; font-size: 18px; text-align: center;">PAGE01 - 스피닝 버전</span>
         <a href="PAGE02/">PAGE02 - 3D버전 + 로고영상 버전</a>
         <a href="PAGE03/">PAGE03 - 로고영상 버전</a>
     </div>

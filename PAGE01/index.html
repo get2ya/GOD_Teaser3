@@ -3,37 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE GOD OF HIGHSCHOOL CHANGE</title>
+    <title>THE GOD OF HIGHSCHOOL CHANGE - 티저</title>
     <link rel="icon" type="image/x-icon" href="../resource/favicon.ico">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/TmonMonsori/TmonMonsori.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/GmarketSans.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 배경 그룹 -->
-    <div class="background-group">
-        <!-- background.jpg -->
-        <div class="bg-layer bg-photo"></div>
+    <main class="scroll-container">
+        <!-- 우측 상단 네이버 라운지 버튼 -->
+        <a href="https://game.naver.com/lounge/GOD_highschool/home" target="_blank" class="top-naver-btn">
+            <img src="../resource/naverbttn.png" alt="네이버 라운지" class="naver-btn-img">
+        </a>
 
-        <!-- big_change.png -->
-        <div class="bg-layer bg-change">
-            <img src="../resource/big_change.png" alt="">
-        </div>
+        <section id="main" class="main-section snap-section">
+            <!-- 배경 레이어 1: 기본 배경 (맨 뒤) -->
+            <!-- background.jpg는 .main-section의 CSS background로 적용 -->
 
-        <!-- big_2.png -->
-        <div class="bg-layer bg-two">
-            <img src="../resource/big_2.png" alt="">
-        </div>
-    </div>
+            <!-- 배경 레이어 2: big_change (CHANGE 텍스트) -->
+            <div class="bg-layer bg-change">
+                <img src="../resource/big_change.png" alt="" class="bg-change-img">
+            </div>
 
-    <!-- 로고 연출 (WebP 애니메이션) -->
-    <div class="logo-container">
-        <img src="../resource/MV/LOGO play.webp" alt="GOD OF HIGHSCHOOL LOGO" class="logo-animation">
-    </div>
+            <!-- 배경 레이어 3: big_2 (숫자 2) -->
+            <div class="bg-layer bg-two">
+                <img src="../resource/big_2.png" alt="" class="bg-two-img">
+            </div>
 
-    <!-- 네이버 라운지 버튼 -->
-    <a href="https://game.naver.com/lounge/GOD_highschool/home" target="_blank" class="naver-btn">
-        <img src="../resource/naverbttn.png" alt="네이버 라운지">
-    </a>
+            <!-- 초기 암전 + 플래시 -->
+            <div class="intro-blackout"></div>
+            <div class="flash-burst"></div>
 
+            <!-- 로고 등장 시 화면 전체 플래시 -->
+            <div class="logo-flash-overlay"></div>
+
+            <!-- 글로우 오라 효과 -->
+            <div class="glow-orb"></div>
+
+            <!-- 히어로 오버레이 (비네팅/그라데이션) -->
+            <div class="hero-background">
+                <div class="hero-overlay"></div>
+            </div>
+
+            <!-- 비네팅 효과 -->
+            <div class="vignette"></div>
+
+            <!-- 지속 먼지/빛 파티클 -->
+            <div class="dust-container">
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+                <div class="dust"></div>
+            </div>
+
+            <!-- 눈꽃송이 파티클 컨테이너 -->
+            <div class="snowflake-container" id="snowflake-container"></div>
+
+            <!-- 로고 -->
+            <div class="main-content">
+                <div class="logo-reveal">
+                    <!-- 스파크/불꽃 파티클 (로고 중심) -->
+                    <div class="sparks-container">
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                        <div class="spark"></div>
+                    </div>
+                    <!-- 에너지 파동 (로고 중심) -->
+                    <div class="energy-wave"></div>
+                    <div class="energy-wave delay-1"></div>
+                    <div class="energy-wave delay-2"></div>
+                    <!-- 동심원 효과 -->
+                    <div class="concentric-rings">
+                        <div class="ring ring-1"></div>
+                        <div class="ring ring-2"></div>
+                        <div class="ring ring-3"></div>
+                        <div class="ring ring-4"></div>
+                        <div class="ring ring-5"></div>
+                    </div>
+                    <!-- 로고 애니메이션 컨테이너 -->
+                    <div class="logo-animation-container">
+                        <img src="../resource/logo_04.png" alt="GOD OF HIGHSCHOOL Logo Base" class="logo-base">
+                        <img src="../resource/logo_05.png" alt="GOD OF HIGHSCHOOL Logo Middle" class="logo-middle">
+                        <!-- logo_02: 부모(등장)-자식(회전) 구조로 분리하여 애니메이션 교체 시 깜빡임 방지 -->
+                        <div class="logo-overlay-wrapper">
+                            <div class="logo-overlay-inner">
+                                <img src="../resource/logo_02.png" alt="GOD OF HIGHSCHOOL Logo Overlay" class="logo-overlay-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 섹션2 비활성화 (로딩 안함)
+        <section id="community" class="community-section snap-section">
+            <div class="community-bg-effect"></div>
+            <div class="community-particles">
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+                <div class="c-particle"></div>
+            </div>
+
+            <div class="community-content">
+                <div class="slogan-container">
+                    <div class="slogan-glow"></div>
+                    <img src="../resource/slogan.png" alt="슬로건" class="slogan-image">
+                    <div class="slogan-sparkles">
+                        <span class="slogan-sparkle"></span>
+                        <span class="slogan-sparkle"></span>
+                        <span class="slogan-sparkle"></span>
+                        <span class="slogan-sparkle"></span>
+                        <span class="slogan-sparkle"></span>
+                        <span class="slogan-sparkle"></span>
+                    </div>
+                </div>
+
+                <div class="logo-container">
+                    <img src="../resource/logo.png" alt="THE GOD OF HIGHSCHOOL CHANGE" class="game-logo">
+                </div>
+
+                <h2 class="community-title">공식 커뮤니티</h2>
+
+                <p class="community-description">
+                    사전예약이 곧 시작됩니다.<br>
+                    게임 정보를 공식 커뮤니티에서<br class="mobile-br"> 미리 확인하세요!
+                </p>
+
+                <div class="community-buttons">
+                    <a href="https://cafe.naver.com/godofhighschool" target="_blank" class="community-btn naver">
+                        <span class="btn-icon">N</span>
+                        <span class="btn-text">네이버 공식 카페 바로가기</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        -->
+    </main>
+
+    <!-- Pixi.js 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.3.2/dist/pixi.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

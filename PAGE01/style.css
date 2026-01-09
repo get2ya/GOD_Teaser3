@@ -1,213 +1,2434 @@
-/* ========== 기본 리셋 ========== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
+html {
+    scroll-behavior: smooth;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #ffffff;
     overflow: hidden;
     background: #000000;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
 }
 
-/* ========== 배경 그룹 ========== */
-.background-group {
-    position: fixed;
-    top: 0;
-    left: 0;
+.scroll-container {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
+    height: 100dvh; /* iOS 크롬 등 동적 툴바 대응 */
+    width: 100vw;
+}
+
+.scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    min-height: 100dvh; /* iOS 크롬 등 동적 툴바 대응 */
+    position: relative;
+    will-change: transform;
+}
+
+.main-section {
+    position: relative;
     width: 100%;
-    height: 100%;
-    z-index: 0;
+    height: 100vh;
+    height: 100dvh; /* iOS 크롬 등 동적 툴바 대응 */
+    overflow: hidden;
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center;
+    padding-bottom: 0;
+    background: url('../resource/background.jpg') center center / cover no-repeat;
+    background-color: #000000;
+    /* 인트로: 어둠에서 배경 페이드인 (더 어둡게) */
+    animation: bgFadeIn 2s ease-out forwards;
 }
 
+/* 배경 페이드인 애니메이션 - 더 어둡게 유지 */
+@keyframes bgFadeIn {
+    0% {
+        filter: brightness(0);
+    }
+    100% {
+        filter: brightness(0.6); /* 배경 어둡게 */
+    }
+}
+
+/* ========== 배경 레이어 (big_change, big_2) ========== */
 .bg-layer {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: none;
 }
 
-/* background.jpg */
-.bg-photo {
-    z-index: 0;
-    background: url('../resource/background.jpg') center center / cover no-repeat;
-}
-
-/* big_change.png */
+/* big_change (CHANGE 텍스트) - 배경 위, 로고 뒤 */
 .bg-change {
     z-index: 1;
+    /* iOS 최적화: GPU 가속 활성화 */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
 }
 
-.bg-change img {
+/* big_change 진동 효과 (로고 착지 시) */
+.bg-change.impact-shake {
+    animation: bgChangeShake 0.6s ease-out forwards;
+}
+
+@keyframes bgChangeShake {
+    0%, 100% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    10% {
+        -webkit-transform: translate3d(-20px, 10px, 0) scale(1.02);
+        transform: translate3d(-20px, 10px, 0) scale(1.02);
+    }
+    20% {
+        -webkit-transform: translate3d(20px, -10px, 0) scale(1.02);
+        transform: translate3d(20px, -10px, 0) scale(1.02);
+    }
+    30% {
+        -webkit-transform: translate3d(-15px, -8px, 0) scale(1.01);
+        transform: translate3d(-15px, -8px, 0) scale(1.01);
+    }
+    40% {
+        -webkit-transform: translate3d(15px, 8px, 0) scale(1.01);
+        transform: translate3d(15px, 8px, 0) scale(1.01);
+    }
+    50% {
+        -webkit-transform: translate3d(-10px, 5px, 0) scale(1);
+        transform: translate3d(-10px, 5px, 0) scale(1);
+    }
+    60% {
+        -webkit-transform: translate3d(10px, -5px, 0) scale(1);
+        transform: translate3d(10px, -5px, 0) scale(1);
+    }
+    70% {
+        -webkit-transform: translate3d(-5px, 3px, 0) scale(1);
+        transform: translate3d(-5px, 3px, 0) scale(1);
+    }
+    80% {
+        -webkit-transform: translate3d(5px, -3px, 0) scale(1);
+        transform: translate3d(5px, -3px, 0) scale(1);
+    }
+    90% {
+        -webkit-transform: translate3d(-2px, 0, 0) scale(1);
+        transform: translate3d(-2px, 0, 0) scale(1);
+    }
+}
+
+.bg-change-img {
     width: 100%;
-    height: auto;
     max-width: none;
+    height: auto;
+    /* 초기: 완전 숨김 상태 (인트로 연출용) */
+    opacity: 0;
+    filter: brightness(1.8) contrast(1.2) drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+    /* 인트로 애니메이션: 즉시 시작, 5초 동안 (배경 페이드인 2초 직후 플래시) */
+    animation: bgChangeIntro 5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* big_2.png */
+/* big_change 인트로 애니메이션 - 배경 페이드인(2초) 직후 번쩍 */
+/* 5초 기준: 40% = 2초, 60% = 3초 */
+@keyframes bgChangeIntro {
+    0% {
+        opacity: 0;
+        filter: brightness(1) contrast(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+    20% {
+        /* 1초: 서서히 나타남 */
+        opacity: 0.1;
+        filter: brightness(1.3) contrast(1.05) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
+        -webkit-transform: scale(0.95);
+        transform: scale(0.95);
+    }
+    35% {
+        /* 1.75초: 플래시 직전 */
+        opacity: 0.25;
+        filter: brightness(1.8) contrast(1.15) drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+        -webkit-transform: scale(0.98);
+        transform: scale(0.98);
+    }
+    40% {
+        /* 2초: 번쩍 시작 - 최대 밝기 (배경 페이드인 완료 직후) */
+        opacity: 0.8;
+        filter: brightness(4) contrast(1.5) drop-shadow(0 0 50px rgba(255, 255, 255, 0.9));
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+    }
+    60% {
+        /* 3초: 번쩍 유지 (1초간) */
+        opacity: 0.8;
+        filter: brightness(4) contrast(1.5) drop-shadow(0 0 50px rgba(255, 255, 255, 0.9));
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+    }
+    80% {
+        /* 4초: 서서히 안정화 */
+        opacity: 0.55;
+        filter: brightness(2.5) contrast(1.35) drop-shadow(0 0 30px rgba(255, 255, 255, 0.5));
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    100% {
+        /* 5초: 최종 상태 - 로고 등장 대기 */
+        opacity: 0.5;
+        filter: brightness(2) contrast(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+/* big_2 (숫자 2) - big_change 위, 로고 뒤 */
 .bg-two {
     z-index: 2;
+    /* iOS 최적화: GPU 가속 활성화 */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
 }
 
-.bg-two img {
+/* big_2 진동 효과 (로고 착지 시 - big_change와 다른 타이밍) */
+.bg-two.impact-shake {
+    animation: bgTwoShake 0.5s ease-out forwards;
+}
+
+@keyframes bgTwoShake {
+    0%, 100% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    15% {
+        -webkit-transform: translate3d(15px, -12px, 0) scale(1.03);
+        transform: translate3d(15px, -12px, 0) scale(1.03);
+    }
+    30% {
+        -webkit-transform: translate3d(-12px, 8px, 0) scale(1.02);
+        transform: translate3d(-12px, 8px, 0) scale(1.02);
+    }
+    45% {
+        -webkit-transform: translate3d(10px, -6px, 0) scale(1.01);
+        transform: translate3d(10px, -6px, 0) scale(1.01);
+    }
+    60% {
+        -webkit-transform: translate3d(-8px, 5px, 0) scale(1);
+        transform: translate3d(-8px, 5px, 0) scale(1);
+    }
+    75% {
+        -webkit-transform: translate3d(5px, -3px, 0) scale(1);
+        transform: translate3d(5px, -3px, 0) scale(1);
+    }
+    90% {
+        -webkit-transform: translate3d(-2px, 1px, 0) scale(1);
+        transform: translate3d(-2px, 1px, 0) scale(1);
+    }
+}
+
+.bg-two-img {
+    /* 화면 가득 차게 (세로 기준) */
+    width: auto;
     height: 90vh;
-    width: auto;
     max-width: none;
-    opacity: 0.15;
-    filter: brightness(1.2) contrast(1.1);
-}
-
-/* ========== 로고 컨테이너 ========== */
-.logo-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    pointer-events: none;
-}
-
-.logo-animation {
-    width: 550px;
-    height: auto;
-    max-width: 90vw;
-}
-
-/* ========== 네이버 버튼 ========== */
-.naver-btn {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 1000;
+    max-height: 90vh;
+    /* 초기: 숨김 → 배경과 함께 페이드인 */
     opacity: 0;
-    transform: translateY(-20px);
-    pointer-events: none;
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    filter: brightness(1.2) contrast(1.1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.15));
+    /* 인트로: 배경과 함께 천천히 밝아짐 (어둡게 유지) */
+    animation: bgTwoIntro 2s ease-out 0.5s forwards;
 }
 
-.naver-btn.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
+/* big_2 인트로 애니메이션 - 배경과 함께 어둡게 페이드인 */
+@keyframes bgTwoIntro {
+    0% {
+        opacity: 0;
+        filter: brightness(1) contrast(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+    }
+    100% {
+        /* 최종: 어둡게 유지 */
+        opacity: 0.15;
+        filter: brightness(1.2) contrast(1.1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.15));
+    }
 }
 
-.naver-btn img {
-    height: 48px;
-    width: auto;
+/* 우측 상단 네이버 라운지 버튼 (이미지 기반) */
+.top-naver-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
     display: block;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
-    transition: transform 0.3s ease, filter 0.3s ease;
+    text-decoration: none;
+    opacity: 0;
+    /* 9s: 로고 글로우/플로팅(7.8s) 후 등장 */
+    animation: topBtnAppear 0.8s ease-out 9s forwards;
+    transition: transform 0.15s ease;
 }
 
-.naver-btn:hover img {
-    transform: scale(1.05);
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+.top-naver-btn:hover {
+    transform: scale(1.03);
 }
 
-.naver-btn:active img {
+.top-naver-btn:active {
     transform: scale(0.98);
 }
 
-/* ============================================
-   반응형: PC (1025px 이상)
-   ============================================ */
-@media (min-width: 1025px) {
-    .logo-animation {
-        width: 550px;
-    }
+/* 버튼 이미지 공통 */
+.naver-btn-img {
+    display: block;
+    height: 44px;
+    width: auto;
+    transition: opacity 0.15s ease;
+}
 
-    .bg-two img {
-        height: 90vh;
-    }
+/* 호버 상태: 밝기 증가 효과 */
+.top-naver-btn:hover .naver-btn-img {
+    filter: brightness(1.2);
+}
 
-    .naver-btn {
-        top: 24px;
-        right: 24px;
-    }
+/* 클릭(active) 상태: 약간 어둡게 */
+.top-naver-btn:active .naver-btn-img {
+    filter: brightness(0.9);
+}
 
-    .naver-btn img {
-        height: 48px;
+@keyframes topBtnAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* ============================================
-   반응형: 타블릿 (601px ~ 1024px)
-   ============================================ */
-@media (min-width: 601px) and (max-width: 1024px) {
-    .logo-animation {
-        width: 450px;
-        max-width: 70vw;
-    }
-
-    .bg-two img {
-        height: 80vh;
-    }
-
-    .naver-btn {
-        top: 20px;
-        right: 20px;
-    }
-
-    .naver-btn img {
-        height: 44px;
-    }
-}
-
-/* ============================================
-   반응형: 모바일 (600px 이하)
-   ============================================ */
+/* 모바일에서 버튼 크기 조정 */
+/* 브레이크포인트: 600px (갤럭시 폴드 펼친 상태 717px는 PC 버전으로 표시) */
 @media (max-width: 600px) {
-    .logo-animation {
-        width: 320px;
-        max-width: 85vw;
+    /* 모바일 배경 레이어 - 배경 페이드인(2초) 직후 플래시 */
+    .bg-change-img {
+        width: 100%;
+        /* 모바일: 즉시 시작, 5초 동안 (배경 페이드인 2초 직후 플래시) */
+        animation: bgChangeIntroMobile 5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
-    .bg-two img {
-        height: 70vh;
-        opacity: 0.1;
+    @keyframes bgChangeIntroMobile {
+        0% {
+            opacity: 0;
+            filter: brightness(1) contrast(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+            -webkit-transform: scale(0.9);
+            transform: scale(0.9);
+        }
+        20% {
+            /* 1초: 서서히 나타남 */
+            opacity: 0.08;
+            filter: brightness(1.2) contrast(1.03) drop-shadow(0 0 5px rgba(255, 255, 255, 0.08));
+            -webkit-transform: scale(0.95);
+            transform: scale(0.95);
+        }
+        35% {
+            /* 1.75초: 플래시 직전 */
+            opacity: 0.2;
+            filter: brightness(1.6) contrast(1.1) drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+            -webkit-transform: scale(0.98);
+            transform: scale(0.98);
+        }
+        40% {
+            /* 2초: 번쩍 시작 - 최대 밝기 (배경 페이드인 완료 직후) */
+            opacity: 0.65;
+            filter: brightness(3.5) contrast(1.4) drop-shadow(0 0 40px rgba(255, 255, 255, 0.8));
+            -webkit-transform: scale(1.02);
+            transform: scale(1.02);
+        }
+        60% {
+            /* 3초: 번쩍 유지 (1초간) */
+            opacity: 0.65;
+            filter: brightness(3.5) contrast(1.4) drop-shadow(0 0 40px rgba(255, 255, 255, 0.8));
+            -webkit-transform: scale(1.02);
+            transform: scale(1.02);
+        }
+        80% {
+            /* 4초: 서서히 안정화 */
+            opacity: 0.45;
+            filter: brightness(2.2) contrast(1.25) drop-shadow(0 0 25px rgba(255, 255, 255, 0.45));
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+        100% {
+            /* 5초: 최종 상태 */
+            opacity: 0.4;
+            filter: brightness(1.8) contrast(1.2) drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
     }
 
-    .naver-btn {
-        top: 16px;
-        right: 16px;
+    .bg-two-img {
+        height: 80vh;
+        max-height: 80vh;
+        /* 모바일: 어둡게 천천히 페이드인 */
+        animation: bgTwoIntroMobile 2s ease-out 0.5s forwards;
     }
 
-    .naver-btn img {
+    @keyframes bgTwoIntroMobile {
+        0% {
+            opacity: 0;
+            filter: brightness(1) contrast(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+        }
+        100% {
+            /* 모바일: 더 어둡게 */
+            opacity: 0.1;
+            filter: brightness(1.1) contrast(1.05) drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+        }
+    }
+
+    .top-naver-btn {
+        top: 15px;
+        right: 15px;
+    }
+
+    .naver-btn-img {
         height: 38px;
     }
 }
 
-/* ============================================
-   반응형: 소형 모바일 (400px 이하)
-   ============================================ */
 @media (max-width: 400px) {
-    .logo-animation {
-        width: 280px;
-        max-width: 90vw;
+    .top-naver-btn {
+        top: 10px;
+        right: 10px;
     }
 
-    .bg-two img {
-        height: 60vh;
-        opacity: 0.08;
-    }
-
-    .naver-btn {
-        top: 12px;
-        right: 12px;
-    }
-
-    .naver-btn img {
+    .naver-btn-img {
         height: 32px;
+    }
+}
+
+/* ========== 인트로 연출 효과 ========== */
+
+/* 초기 암전 */
+.intro-blackout {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    z-index: 100;
+    animation: blackoutFade 1.5s ease-out 1.2s forwards;
+}
+
+@keyframes blackoutFade {
+    0% { opacity: 1; }
+    100% { opacity: 0; pointer-events: none; }
+}
+
+/* 플래시 터짐 효과 - 로고 착지 시점(7.2s)에 발생 */
+.flash-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 200, 100, 0.9) 10%,
+        rgba(255, 107, 0, 0.7) 25%,
+        rgba(255, 50, 0, 0.4) 45%,
+        transparent 65%);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    /* 기본: 애니메이션 없음 (JS에서 .start-burst 클래스로 트리거) */
+}
+
+/* JS에서 .start-burst 클래스 추가 시 애니메이션 시작 */
+.flash-burst.start-burst {
+    animation: flashBurst 1s ease-out forwards;
+}
+
+@keyframes flashBurst {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+        filter: brightness(3);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.3);
+        filter: brightness(2);
+    }
+    30% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.5);
+        filter: brightness(1);
+    }
+}
+
+/* 로고 등장 시 화면 전체 플래시 효과 (JS에서 .start-flash 클래스로 트리거) */
+.logo-flash-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* 그라디언트: 중심은 밝은 흰색 -> 외곽은 검정(Screen 모드에서 투명 처리) */
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 230, 180, 0.8) 25%,
+        rgba(255, 100, 0, 0.4) 50%,
+        #000000 90%
+    );
+
+    /* 블렌딩 모드: 빛을 '더하기' 연산하여 검정 배경 위에서 강렬하게 */
+    mix-blend-mode: screen;
+
+    /* 화면 전체를 덮는 빛 추가 */
+    box-shadow: 0 0 100px 50px rgba(255, 255, 255, 0.5);
+
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    /* 애니메이션은 JS에서 .start-flash 클래스 추가 시 시작 */
+}
+
+.logo-flash-overlay.start-flash {
+    animation: logoFlash 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes logoFlash {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    10% {
+        /* 순식간에 최대 밝기 (폭발) */
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2.5);
+    }
+}
+
+/* 글로우 오라 효과 - 로고 착지 시점(7.2s)에 발생 */
+.glow-orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle,
+        rgba(255, 150, 50, 0.6) 0%,
+        rgba(255, 107, 0, 0.3) 30%,
+        rgba(255, 50, 0, 0.1) 60%,
+        transparent 70%);
+    z-index: 18;
+    pointer-events: none;
+    opacity: 0;
+    border-radius: 50%;
+    filter: blur(20px);
+    /* 기본: 애니메이션 없음 (JS에서 .start-orb 클래스로 트리거) */
+}
+
+/* JS에서 .start-orb 클래스 추가 시 애니메이션 시작 */
+.glow-orb.start-orb {
+    animation: orbAppear 1s ease-out forwards, orbPulse 3s ease-in-out 1s infinite;
+}
+
+@keyframes orbAppear {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+    100% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes orbPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.5;
+        filter: blur(20px);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.8;
+        filter: blur(30px);
+    }
+}
+
+/* 스파크 불꽃 파티클 - 더 화려하게 */
+.sparks-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.spark {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle,
+        #ffffff 0%,
+        #ffdd44 20%,
+        #ffaa00 40%,
+        #ff6600 70%,
+        transparent 100%);
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow:
+        0 0 6px 2px #ffffff,
+        0 0 12px 4px #ffcc00,
+        0 0 20px 6px #ff6600,
+        0 0 35px 8px rgba(255, 51, 0, 0.5);
+}
+
+/* 스파크 꼬리 효과 */
+.spark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 3px;
+    background: linear-gradient(90deg,
+        rgba(255, 200, 100, 0.8) 0%,
+        transparent 100%);
+    transform-origin: left center;
+    border-radius: 2px;
+}
+
+/* 스파크 위치 및 애니메이션 (logo_01 착지 2.4초에 맞춤) */
+.spark:nth-child(1) { left: 50%; top: 50%; animation: sparkFly1 2s ease-out 2.4s forwards; }
+.spark:nth-child(2) { left: 50%; top: 50%; animation: sparkFly2 2.2s ease-out 2.45s forwards; }
+.spark:nth-child(3) { left: 50%; top: 50%; animation: sparkFly3 1.8s ease-out 2.5s forwards; }
+.spark:nth-child(4) { left: 50%; top: 50%; animation: sparkFly4 2.5s ease-out 2.4s forwards; }
+.spark:nth-child(5) { left: 50%; top: 50%; animation: sparkFly5 2s ease-out 2.55s forwards; }
+.spark:nth-child(6) { left: 50%; top: 50%; animation: sparkFly6 2.3s ease-out 2.45s forwards; }
+.spark:nth-child(7) { left: 50%; top: 50%; animation: sparkFly7 1.9s ease-out 2.5s forwards; }
+.spark:nth-child(8) { left: 50%; top: 50%; animation: sparkFly8 2.1s ease-out 2.4s forwards; }
+.spark:nth-child(9) { left: 50%; top: 50%; animation: sparkFly1 2.4s ease-out 2.6s forwards; }
+.spark:nth-child(10) { left: 50%; top: 50%; animation: sparkFly2 2s ease-out 2.65s forwards; }
+.spark:nth-child(11) { left: 50%; top: 50%; animation: sparkFly3 2.2s ease-out 2.55s forwards; }
+.spark:nth-child(12) { left: 50%; top: 50%; animation: sparkFly4 1.8s ease-out 2.7s forwards; }
+.spark:nth-child(13) { left: 50%; top: 50%; animation: sparkFly5 2.6s ease-out 2.5s forwards; }
+.spark:nth-child(14) { left: 50%; top: 50%; animation: sparkFly6 2s ease-out 2.75s forwards; }
+.spark:nth-child(15) { left: 50%; top: 50%; animation: sparkFly7 2.3s ease-out 2.6s forwards; }
+.spark:nth-child(16) { left: 50%; top: 50%; animation: sparkFly8 1.9s ease-out 2.8s forwards; }
+.spark:nth-child(17) { left: 50%; top: 50%; animation: sparkFly1 2.1s ease-out 2.7s forwards; }
+.spark:nth-child(18) { left: 50%; top: 50%; animation: sparkFly3 2.4s ease-out 2.65s forwards; }
+.spark:nth-child(19) { left: 50%; top: 50%; animation: sparkFly5 2s ease-out 2.75s forwards; }
+.spark:nth-child(20) { left: 50%; top: 50%; animation: sparkFly7 2.2s ease-out 2.85s forwards; }
+
+@keyframes sparkFly1 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-200px, -300px) scale(0); }
+}
+@keyframes sparkFly2 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(250px, -280px) scale(0); }
+}
+@keyframes sparkFly3 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-300px, 150px) scale(0); }
+}
+@keyframes sparkFly4 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(280px, 200px) scale(0); }
+}
+@keyframes sparkFly5 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-150px, -350px) scale(0); }
+}
+@keyframes sparkFly6 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(180px, -320px) scale(0); }
+}
+@keyframes sparkFly7 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-350px, -100px) scale(0); }
+}
+@keyframes sparkFly8 {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(320px, 50px) scale(0); }
+}
+
+/* 에너지 파동 - 더 강렬하게 */
+.energy-wave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 107, 0, 0.9);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transform-origin: center center; /* 카톡 인앱 브라우저 호환성 */
+    z-index: -1;
+    opacity: 0;
+    box-shadow: 0 0 30px rgba(255, 107, 0, 0.5), inset 0 0 30px rgba(255, 107, 0, 0.3);
+    animation: energyPulse 3s ease-out 2.4s forwards;
+    will-change: transform, opacity; /* 하드웨어 가속 */
+    pointer-events: none;
+}
+
+.energy-wave.delay-1 {
+    animation-delay: 2.6s;
+    border-color: rgba(255, 170, 0, 0.8);
+}
+
+.energy-wave.delay-2 {
+    animation-delay: 2.8s;
+    border-color: rgba(255, 200, 0, 0.7);
+}
+
+@keyframes energyPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+        border-width: 6px;
+        border-color: rgba(255, 107, 0, 0.9);
+        box-shadow:
+            0 0 30px rgba(255, 107, 0, 0.8),
+            0 0 60px rgba(255, 170, 0, 0.5),
+            inset 0 0 30px rgba(255, 107, 0, 0.4);
+    }
+    40% {
+        border-color: rgba(0, 150, 255, 0.8);
+        box-shadow:
+            0 0 35px rgba(0, 150, 255, 0.7),
+            0 0 70px rgba(0, 100, 255, 0.4),
+            inset 0 0 35px rgba(0, 150, 255, 0.3);
+    }
+    70% {
+        border-color: rgba(255, 255, 255, 0.7);
+        box-shadow:
+            0 0 40px rgba(255, 255, 255, 0.6),
+            0 0 80px rgba(200, 220, 255, 0.3),
+            inset 0 0 40px rgba(255, 255, 255, 0.2);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(30);
+        opacity: 0;
+        border-width: 1px;
+        border-color: rgba(255, 255, 255, 0);
+        box-shadow:
+            0 0 50px rgba(255, 255, 255, 0),
+            0 0 100px rgba(255, 255, 255, 0),
+            inset 0 0 50px rgba(255, 255, 255, 0);
+    }
+}
+
+/* 캐릭터 등장 - 실루엣에서 컬러로 */
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: characterReveal 2.5s ease-out 1.5s forwards;
+}
+
+/* Pixi.js 물결 효과 캔버스 - 기존 배경 위에 오버레이 */
+#pixi-ripple-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#pixi-ripple-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+@keyframes characterReveal {
+    0% {
+        opacity: 0;
+        transform: scale(1.15);
+        filter: brightness(0) blur(20px);
+    }
+    30% {
+        opacity: 0.7;
+        filter: brightness(3) saturate(0) blur(10px);
+    }
+    60% {
+        filter: brightness(2) saturate(0.5) blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1) saturate(1) blur(0);
+    }
+}
+
+/* 비네팅 효과 */
+.vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(0, 0, 0, 0.3) 70%,
+        rgba(0, 0, 0, 0.7) 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 지속 먼지/빛 파티클 */
+/* [임시 비활성화] 먼지 파티클 */
+.dust-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 19;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    /* 6.2s: 로고 착지(6.2s) 후 먼지 파티클 등장 */
+    /* animation: dustFadeIn 1s ease-out 6.2s forwards; */
+}
+
+@keyframes dustFadeIn {
+    to { opacity: 1; }
+}
+
+.dust {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle,
+        rgba(255, 200, 150, 0.9) 0%,
+        rgba(255, 150, 100, 0.5) 50%,
+        transparent 100%);
+    border-radius: 50%;
+    animation: dustFloat 10s ease-in-out infinite;
+}
+
+.dust:nth-child(1) { left: 5%; top: 10%; animation-delay: 0s; animation-duration: 12s; }
+.dust:nth-child(2) { left: 15%; top: 60%; animation-delay: 1s; animation-duration: 14s; }
+.dust:nth-child(3) { left: 25%; top: 30%; animation-delay: 2s; animation-duration: 11s; }
+.dust:nth-child(4) { left: 35%; top: 80%; animation-delay: 0.5s; animation-duration: 13s; }
+.dust:nth-child(5) { left: 45%; top: 20%; animation-delay: 1.5s; animation-duration: 15s; }
+.dust:nth-child(6) { left: 55%; top: 70%; animation-delay: 2.5s; animation-duration: 12s; }
+.dust:nth-child(7) { left: 65%; top: 40%; animation-delay: 0.8s; animation-duration: 14s; }
+.dust:nth-child(8) { left: 75%; top: 90%; animation-delay: 1.8s; animation-duration: 11s; }
+.dust:nth-child(9) { left: 85%; top: 50%; animation-delay: 3s; animation-duration: 13s; }
+.dust:nth-child(10) { left: 95%; top: 25%; animation-delay: 2.2s; animation-duration: 16s; }
+.dust:nth-child(11) { left: 10%; top: 85%; animation-delay: 0.3s; animation-duration: 12s; }
+.dust:nth-child(12) { left: 30%; top: 55%; animation-delay: 1.2s; animation-duration: 14s; }
+.dust:nth-child(13) { left: 50%; top: 5%; animation-delay: 2.8s; animation-duration: 11s; }
+.dust:nth-child(14) { left: 70%; top: 75%; animation-delay: 0.7s; animation-duration: 15s; }
+.dust:nth-child(15) { left: 90%; top: 35%; animation-delay: 1.9s; animation-duration: 13s; }
+.dust:nth-child(16) { left: 8%; top: 45%; animation-delay: 0.4s; animation-duration: 13s; }
+.dust:nth-child(17) { left: 18%; top: 15%; animation-delay: 1.6s; animation-duration: 11s; }
+.dust:nth-child(18) { left: 28%; top: 72%; animation-delay: 2.3s; animation-duration: 14s; }
+.dust:nth-child(19) { left: 38%; top: 38%; animation-delay: 0.9s; animation-duration: 12s; }
+.dust:nth-child(20) { left: 48%; top: 88%; animation-delay: 1.1s; animation-duration: 15s; }
+.dust:nth-child(21) { left: 58%; top: 22%; animation-delay: 2.7s; animation-duration: 13s; }
+.dust:nth-child(22) { left: 68%; top: 65%; animation-delay: 0.6s; animation-duration: 11s; }
+.dust:nth-child(23) { left: 78%; top: 8%; animation-delay: 1.4s; animation-duration: 14s; }
+.dust:nth-child(24) { left: 88%; top: 78%; animation-delay: 2.1s; animation-duration: 12s; }
+.dust:nth-child(25) { left: 3%; top: 52%; animation-delay: 0.2s; animation-duration: 15s; }
+.dust:nth-child(26) { left: 22%; top: 92%; animation-delay: 1.7s; animation-duration: 13s; }
+.dust:nth-child(27) { left: 42%; top: 48%; animation-delay: 2.9s; animation-duration: 11s; }
+.dust:nth-child(28) { left: 62%; top: 12%; animation-delay: 0.1s; animation-duration: 14s; }
+.dust:nth-child(29) { left: 82%; top: 58%; animation-delay: 1.3s; animation-duration: 12s; }
+.dust:nth-child(30) { left: 97%; top: 82%; animation-delay: 2.4s; animation-duration: 15s; }
+
+@keyframes dustFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    25% {
+        transform: translate(30px, -20px) scale(1.2);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-20px, -40px) scale(0.8);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translate(15px, -60px) scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* 중앙 캐릭터는 밝게, 가장자리/하단만 어둡게 */
+    background:
+        radial-gradient(ellipse 60% 70% at 50% 40%, transparent 0%, rgba(0,0,0,0.5) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+}
+
+.main-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 로고 등장 연출 - 강렬한 임팩트 */
+.logo-reveal {
+    position: relative;
+    opacity: 0;
+    /* animation 제거 - JS .loaded 클래스로 트리거 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* 부모 너비 전체 사용 */
+    -webkit-perspective: 1200px; /* iOS Safari 호환 */
+    perspective: 1200px; /* 3D 회전 원근감 */
+}
+
+/* logo-reveal JS 트리거 애니메이션 */
+.logo-reveal.loaded {
+    animation: logoAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ========== 로고 애니메이션 ========== */
+.logo-animation-container {
+    position: relative;
+    max-width: 550px;
+    width: 550px;
+    height: auto;
+    z-index: 10; /* 절대 위치 요소들보다 위에 표시 */
+    /* 정적 filter 제거 - animation-fill-mode: both로 0%부터 제어 */
+    /* 성능 최적화: drop-shadow 변화 미리 감지 */
+    will-change: filter, transform;
+    /* animation 제거 - JS .start-glow 클래스로 트리거 */
+    opacity: 1;
+    -webkit-transform-style: preserve-3d; /* iOS Safari 호환 */
+    transform-style: preserve-3d; /* 자식 요소 3D 효과 유지 */
+    -webkit-backface-visibility: hidden; /* iOS 렌더링 최적화 */
+    backface-visibility: hidden;
+}
+
+/* logo-animation-container JS 트리거 글로우/플로팅 애니메이션 */
+/* 11.8s 시작: startLogoAnimations(5.8s) + 6s setTimeout = 11.8s */
+.logo-animation-container.start-glow {
+    animation: logoGlow 2.5s ease-in-out infinite both,
+               logoFloat 4s ease-in-out infinite both;
+}
+
+/* logo_01: 처음부터 보임 - 빠르게 "빡!" 박히는 연출 */
+/* 애니메이션은 JS에서 이미지 로딩 완료 후 .loaded 클래스 추가로 시작 */
+.logo-base {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0;
+    /* 기본: 애니메이션 없음 (이미지 로딩 대기) */
+}
+
+/* logo_01 로딩 완료 후 애니메이션 시작 */
+.logo-base.loaded {
+    animation: logoBaseAppear 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+/* logo_05: logo_04 위, logo_02 아래 (중간 레이어) */
+.logo-middle {
+    position: absolute;
+    bottom: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72%;
+    height: auto;
+    display: block;
+    opacity: 0;
+    z-index: 1; /* logo_04(0) 위, logo_02(2)보다 아래 */
+    pointer-events: none;
+}
+
+/* logo_05 로딩 완료 후 애니메이션 시작 */
+.logo-middle.loaded {
+    animation: logoMiddleAppear 0.5s cubic-bezier(0.2, 0, 0.2, 1) 0.15s forwards;
+}
+
+/* logo_05 등장 애니메이션 */
+@keyframes logoMiddleAppear {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(6) translateZ(600px);
+        filter: brightness(3) blur(5px);
+    }
+    10% {
+        opacity: 1;
+        filter: brightness(2.5) blur(3px);
+    }
+    60% {
+        transform: translateX(-50%) scale(1.2) translateZ(30px);
+        filter: brightness(1.5) blur(0);
+    }
+    80% {
+        transform: translateX(-50%) scale(0.95) translateZ(-10px);
+        filter: brightness(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateZ(0);
+        filter: brightness(1);
+    }
+}
+
+/* ============================================
+   logo_02 (CHANGE): 부모-자식 구조로 분리
+   - 부모(wrapper): 등장 애니메이션 (위치, 크기, 투명도)
+   - 자식(inner): 회전 애니메이션 (rotateY만)
+   - 애니메이션 교체(Swap) 없이 깜빡임 원천 차단
+   ============================================ */
+
+/* 부모: 위치 잡기 & 등장 효과 담당 */
+/* [수정] filter 속성 제거 - preserve-3d와 filter 충돌로 레이어 깨짐 방지 */
+.logo-overlay-wrapper {
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%); /* X축 정렬만 담당, rotateY 없음 */
+    width: 72%;
+    height: auto;
+    opacity: 0; /* 초기: 안 보임 */
+    transform-origin: center center;
+
+    /* 3D 효과 설정 */
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+}
+
+/* 부모: 등장 애니메이션 실행 */
+.logo-overlay-wrapper.step-appear {
+    animation: changeAppearWrapper 0.5s cubic-bezier(0.2, 0, 0.2, 1) 0.15s forwards;
+}
+
+/* 자식: 회전 담당 */
+.logo-overlay-inner {
+    width: 100%;
+    height: 100%;
+    transform: rotateY(180deg); /* 초기 각도 180도 상시 유지 */
+    transform-origin: center center;
+
+    /* 3D 뒷면 보임 설정 */
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    transform-style: preserve-3d;
+    will-change: transform;
+
+    /* [핵심] 애니메이션을 미리 할당하되 일시정지 상태로 대기 */
+    /* JS에서 animationPlayState = 'running'으로 재생만 하면 깜빡임 0% */
+    animation: logoOverlaySpinInner 7s cubic-bezier(0.6, 0, 0.2, 1) 0s forwards paused;
+}
+
+/* 이미지 스타일 */
+/* [수정] 이미지에 translateZ(0) 추가 - 독립 GPU 레이어 생성으로 깜빡임 방지 */
+.logo-overlay-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transform: translateZ(0); /* 하드웨어 가속 강제 */
+    will-change: transform;
+    backface-visibility: visible;
+}
+
+/* CHANGE 반짝임 효과 (눈송이가 닿을 때) - 자식에 적용 */
+.logo-overlay-inner.sparkle {
+    filter: brightness(1.8) drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)) !important;
+    transition: filter 0.15s ease-out !important;
+}
+
+/* CHANGE 점진적 발광 효과 (스핀 가속 구간) */
+.logo-overlay-inner.glow-buildup {
+    filter: brightness(2) drop-shadow(0 0 30px rgba(255, 255, 255, 0.9))
+            drop-shadow(0 0 60px rgba(255, 200, 100, 0.6)) !important;
+    transition: filter 3.5s ease-in !important;
+}
+
+/* CHANGE 발광 유지 후 서서히 감소 (스핀 감속 구간) */
+.logo-overlay-inner.glow-fadeout {
+    filter: brightness(1) !important;
+    transition: filter 3.5s ease-out !important;
+}
+
+/* logo_01 등장 애니메이션 - 화면 앞에서 "빡!" 박히는 연출 */
+@keyframes logoBaseAppear {
+    0% {
+        opacity: 0;
+        transform: scale(4) translateZ(400px);
+        filter: brightness(3) blur(4px);
+    }
+    15% {
+        opacity: 1;
+        filter: brightness(2.5) blur(2px);
+    }
+    70% {
+        transform: scale(1.1) translateZ(20px);
+        filter: brightness(1.3) blur(0);
+    }
+    85% {
+        /* 오버슈트 - 박히는 느낌 */
+        transform: scale(0.97) translateZ(-5px);
+        filter: brightness(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateZ(0);
+        filter: brightness(1);
+    }
+}
+
+/* 부모용 등장 애니메이션 - filter 제거 (preserve-3d 충돌 방지) */
+@keyframes changeAppearWrapper {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(6) translateZ(600px);
+    }
+    10% {
+        opacity: 1;
+    }
+    60% {
+        /* 빠르게 다가옴 */
+        transform: translateX(-50%) scale(1.2) translateZ(30px);
+    }
+    80% {
+        /* 살짝 오버슈트 (더 작아짐) - 박히는 느낌 */
+        transform: translateX(-50%) scale(0.95) translateZ(-10px);
+    }
+    100% {
+        /* 제자리 착지 */
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateZ(0);
+    }
+}
+
+/* 자식용 스핀 애니메이션 - 순수하게 rotateY만 담당 */
+/* 시작: rotateY(180deg) = 뒷면(좌우 반전), 끝: rotateY(2160deg) = 정확히 6바퀴 후 정상 상태 */
+@keyframes logoOverlaySpinInner {
+    0% {
+        transform: rotateY(180deg); /* 현재 상태에서 시작 */
+    }
+    100% {
+        /* 180 + 1980 = 2160deg (360 * 6 = 정상 상태로 종료) */
+        transform: rotateY(2160deg);
+    }
+}
+
+/* 화면 흔들림 애니메이션 */
+@keyframes screenShake {
+    0%, 100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+    10% {
+        -webkit-transform: translate3d(-15px, -10px, 0);
+        transform: translate3d(-15px, -10px, 0);
+    }
+    20% {
+        -webkit-transform: translate3d(15px, 10px, 0);
+        transform: translate3d(15px, 10px, 0);
+    }
+    30% {
+        -webkit-transform: translate3d(-12px, 6px, 0);
+        transform: translate3d(-12px, 6px, 0);
+    }
+    40% {
+        -webkit-transform: translate3d(12px, -6px, 0);
+        transform: translate3d(12px, -6px, 0);
+    }
+    50% {
+        -webkit-transform: translate3d(-8px, 4px, 0);
+        transform: translate3d(-8px, 4px, 0);
+    }
+    60% {
+        -webkit-transform: translate3d(8px, -4px, 0);
+        transform: translate3d(8px, -4px, 0);
+    }
+    70% {
+        -webkit-transform: translate3d(-4px, 2px, 0);
+        transform: translate3d(-4px, 2px, 0);
+    }
+    80% {
+        -webkit-transform: translate3d(4px, -2px, 0);
+        transform: translate3d(4px, -2px, 0);
+    }
+    90% {
+        -webkit-transform: translate3d(-2px, 0, 0);
+        transform: translate3d(-2px, 0, 0);
+    }
+}
+
+/* 화면 흔들림 클래스 (JS로 추가) */
+.screen-shake {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+    animation: screenShake 0.5s ease-out forwards;
+}
+
+/* ========== 눈꽃송이 파티클 효과 ========== */
+.snowflake-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.snowflake {
+    position: absolute;
+    color: #ffffff;
+    font-size: 16px;
+    opacity: 0;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8),
+                 0 0 15px rgba(200, 220, 255, 0.6);
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+    pointer-events: none;
+    z-index: 100; /* 눈송이가 다른 요소 위에 보이도록 */
+}
+
+/* 기존 reveal-logo 호환성 유지 (모바일 CSS에서 참조) */
+.reveal-logo {
+    max-width: 450px;
+    width: 75%;
+    height: auto;
+    filter: drop-shadow(0 0 30px rgba(255, 107, 0, 0.8))
+            drop-shadow(0 0 60px rgba(255, 170, 0, 0.6))
+            drop-shadow(0 0 100px rgba(255, 50, 0, 0.4));
+    animation: logoGlow 2.5s ease-in-out infinite 4s, logoFloat 4s ease-in-out infinite 4s;
+}
+
+@keyframes logoAppear {
+    0% {
+        opacity: 0;
+        transform: scale(1.5) translateY(0);
+        filter: brightness(5) blur(20px);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(0.9) translateY(0);
+        filter: brightness(3) blur(5px);
+    }
+    50% {
+        transform: scale(1.05) translateY(0);
+        filter: brightness(1.5) blur(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: brightness(1) blur(0);
+    }
+}
+
+@keyframes logoGlow {
+    /* 0%: 최대 강도에서 시작 (커진 상태로 맥동 시작) */
+    0% {
+        filter: drop-shadow(0 0 40px rgba(255, 107, 0, 1))
+                drop-shadow(0 0 80px rgba(255, 170, 0, 0.8))
+                drop-shadow(0 0 120px rgba(255, 50, 0, 0.5));
+    }
+    /* 50%: 가장 약한 상태로 수축 (호흡의 바닥) */
+    50% {
+        filter: drop-shadow(0 0 20px rgba(255, 107, 0, 0.6))
+                drop-shadow(0 0 40px rgba(255, 170, 0, 0.4))
+                drop-shadow(0 0 80px rgba(255, 50, 0, 0.2));
+    }
+    /* 100%: 다시 최대 강도로 복귀 (0%와 동일, 부드러운 루프) */
+    100% {
+        filter: drop-shadow(0 0 40px rgba(255, 107, 0, 1))
+                drop-shadow(0 0 80px rgba(255, 170, 0, 0.8))
+                drop-shadow(0 0 120px rgba(255, 50, 0, 0.5));
+    }
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* 동심원 효과 - 로고 등장 시 퍼져나감 */
+.concentric-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center center; /* 카톡 인앱 브라우저 호환성 */
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 107, 0, 0.8);
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow:
+        0 0 20px rgba(255, 107, 0, 0.6),
+        0 0 40px rgba(255, 170, 0, 0.4),
+        inset 0 0 20px rgba(255, 107, 0, 0.3);
+    will-change: transform, opacity; /* 하드웨어 가속 */
+}
+
+/* 에너지 링: JS에서 .start-ring 클래스 추가 시 애니메이션 시작 (로고 착지와 동기화) */
+/* [임시 비활성화] 에너지 링 폭발 */
+.ring-1.start-ring {
+    /* animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; */
+}
+
+.ring-2.start-ring {
+    /* animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; */
+}
+
+.ring-3.start-ring {
+    /* animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; */
+}
+
+.ring-4.start-ring {
+    /* animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; */
+}
+
+.ring-5.start-ring {
+    /* animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; */
+}
+
+@keyframes ringExpand {
+    0% {
+        width: 80px;
+        height: 80px;
+        opacity: 1;
+        border-width: 5px;
+        border-color: rgba(255, 107, 0, 0.95);
+        box-shadow:
+            0 0 30px rgba(255, 107, 0, 0.9),
+            0 0 60px rgba(255, 170, 0, 0.6),
+            inset 0 0 30px rgba(255, 107, 0, 0.5);
+    }
+    40% {
+        border-color: rgba(0, 150, 255, 0.9);
+        box-shadow:
+            0 0 40px rgba(0, 150, 255, 0.8),
+            0 0 80px rgba(0, 100, 255, 0.5),
+            inset 0 0 40px rgba(0, 150, 255, 0.4);
+    }
+    70% {
+        border-color: rgba(255, 255, 255, 0.8);
+        box-shadow:
+            0 0 50px rgba(255, 255, 255, 0.7),
+            0 0 100px rgba(200, 220, 255, 0.4),
+            inset 0 0 50px rgba(255, 255, 255, 0.3);
+    }
+    100% {
+        width: 1200px;
+        height: 1200px;
+        opacity: 0;
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0);
+        box-shadow:
+            0 0 60px rgba(255, 255, 255, 0),
+            0 0 120px rgba(255, 255, 255, 0),
+            inset 0 0 60px rgba(255, 255, 255, 0);
+    }
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.scroll-indicator span {
+    display: block;
+    font-size: 0.9rem;
+    letter-spacing: 0.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.scroll-arrow {
+    width: 24px;
+    height: 24px;
+    border-left: 2px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+    transform: rotate(-45deg);
+    margin: 0 auto;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        transform: translateX(-50%) translateY(10px);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.community-section {
+    background:
+        linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%),
+        url('../resource/background2.jpg') center center / cover no-repeat;
+    display: none; /* 섹션2 숨김 */
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 커뮤니티 섹션 배경 효과 */
+.community-bg-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center,
+        rgba(255, 107, 0, 0.08) 0%,
+        transparent 50%);
+    pointer-events: none;
+}
+
+/* 커뮤니티 섹션 파티클 */
+.community-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.c-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 170, 100, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 150, 80, 0.5);
+    animation: cParticleFloat 15s ease-in-out infinite;
+    transition: all 1.5s ease-out;
+}
+
+/* 일반 떠다니는 파티클 - 다양한 애니메이션 적용 */
+.c-particle:nth-child(1) { left: 5%; top: 15%; animation: cParticleFloat1 18s ease-in-out infinite; animation-delay: 0s; }
+.c-particle:nth-child(2) { left: 12%; top: 65%; animation: cParticleFloat2 22s ease-in-out infinite; animation-delay: 1.5s; }
+.c-particle:nth-child(3) { left: 20%; top: 35%; animation: cParticleFloat3 16s ease-in-out infinite; animation-delay: 3s; }
+.c-particle:nth-child(4) { left: 28%; top: 85%; animation: cParticleFloat4 20s ease-in-out infinite; animation-delay: 0.8s; }
+.c-particle:nth-child(5) { left: 35%; top: 25%; animation: cParticleFloat1 24s ease-in-out infinite; animation-delay: 2.2s; }
+.c-particle:nth-child(6) { left: 45%; top: 75%; animation: cParticleFloat2 17s ease-in-out infinite; animation-delay: 4s; }
+.c-particle:nth-child(7) { left: 55%; top: 20%; animation: cParticleFloat3 21s ease-in-out infinite; animation-delay: 1.2s; }
+.c-particle:nth-child(8) { left: 65%; top: 80%; animation: cParticleFloat4 19s ease-in-out infinite; animation-delay: 2.8s; }
+.c-particle:nth-child(9) { left: 72%; top: 40%; animation: cParticleFloat1 23s ease-in-out infinite; animation-delay: 0.5s; }
+.c-particle:nth-child(10) { left: 80%; top: 70%; animation: cParticleFloat2 18s ease-in-out infinite; animation-delay: 3.5s; }
+.c-particle:nth-child(11) { left: 88%; top: 30%; animation: cParticleFloat3 25s ease-in-out infinite; animation-delay: 1.8s; }
+.c-particle:nth-child(12) { left: 95%; top: 55%; animation: cParticleFloat4 16s ease-in-out infinite; animation-delay: 4.5s; }
+.c-particle:nth-child(13) { left: 8%; top: 45%; animation: cParticleFloat1 20s ease-in-out infinite; animation-delay: 2.5s; }
+.c-particle:nth-child(14) { left: 32%; top: 55%; animation: cParticleFloat2 24s ease-in-out infinite; animation-delay: 0.3s; }
+.c-particle:nth-child(15) { left: 52%; top: 45%; animation: cParticleFloat3 19s ease-in-out infinite; animation-delay: 3.8s; }
+.c-particle:nth-child(16) { left: 78%; top: 15%; animation: cParticleFloat4 22s ease-in-out infinite; animation-delay: 1s; }
+.c-particle:nth-child(17) { left: 92%; top: 88%; animation: cParticleFloat1 17s ease-in-out infinite; animation-delay: 2s; }
+.c-particle:nth-child(18) { left: 18%; top: 92%; animation: cParticleFloat2 21s ease-in-out infinite; animation-delay: 4.2s; }
+.c-particle:nth-child(19) { left: 42%; top: 10%; animation: cParticleFloat3 23s ease-in-out infinite; animation-delay: 0.7s; }
+.c-particle:nth-child(20) { left: 62%; top: 92%; animation: cParticleFloat4 18s ease-in-out infinite; animation-delay: 3.2s; }
+
+@keyframes cParticleFloat1 {
+    0% { transform: translate(0, 0); opacity: 0.4; }
+    25% { transform: translate(40px, -20px); opacity: 0.8; }
+    50% { transform: translate(20px, -50px); opacity: 0.5; }
+    75% { transform: translate(-30px, -30px); opacity: 0.9; }
+    100% { transform: translate(0, 0); opacity: 0.4; }
+}
+@keyframes cParticleFloat2 {
+    0% { transform: translate(0, 0); opacity: 0.5; }
+    33% { transform: translate(-50px, 30px); opacity: 0.7; }
+    66% { transform: translate(30px, -40px); opacity: 0.9; }
+    100% { transform: translate(0, 0); opacity: 0.5; }
+}
+@keyframes cParticleFloat3 {
+    0% { transform: translate(0, 0); opacity: 0.6; }
+    20% { transform: translate(25px, 45px); opacity: 0.4; }
+    40% { transform: translate(-35px, 20px); opacity: 0.8; }
+    60% { transform: translate(-20px, -35px); opacity: 0.5; }
+    80% { transform: translate(40px, -15px); opacity: 0.7; }
+    100% { transform: translate(0, 0); opacity: 0.6; }
+}
+@keyframes cParticleFloat4 {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+    50% { transform: translate(-45px, -25px) scale(1.3); opacity: 0.9; }
+    100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+}
+
+/* 동적 흡입 파티클 (JS로 생성) */
+.suction-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 170, 100, 0.9);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 150, 80, 0.6);
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* 버튼 주변 스파크/별 효과 */
+.btn-sparkle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 50;
+    width: 8px;
+    height: 8px;
+    opacity: 0;
+}
+
+.btn-sparkle::before,
+.btn-sparkle::after {
+    content: '';
+    position: absolute;
+    background: linear-gradient(90deg, transparent, #03C75A, #ffffff, #03C75A, transparent);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(3, 199, 90, 0.8),
+                0 0 16px rgba(3, 199, 90, 0.5);
+}
+
+/* 십자 모양 스파크 */
+.btn-sparkle::before {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.btn-sparkle::after {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.btn-sparkle.active {
+    animation: sparkleFlash 0.6s ease-out forwards;
+}
+
+@keyframes sparkleFlash {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.5) rotate(45deg);
+    }
+    60% {
+        opacity: 0.8;
+        transform: scale(1) rotate(90deg);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3) rotate(180deg);
+    }
+}
+
+/* 원형 글로우 스파크 */
+.btn-glow-spark {
+    position: absolute;
+    pointer-events: none;
+    z-index: 45;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(3, 199, 90, 0.8) 40%,
+        transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 10px rgba(3, 199, 90, 0.8),
+                0 0 20px rgba(3, 199, 90, 0.5);
+}
+
+.btn-glow-spark.active {
+    animation: glowSparkFlash 0.8s ease-out forwards;
+}
+
+@keyframes glowSparkFlash {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.2);
+    }
+}
+
+/* 에너지 링 이펙트 */
+.btn-energy-ring {
+    position: absolute;
+    pointer-events: none;
+    z-index: 40;
+    width: 120%;
+    height: 120%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(3, 199, 90, 0.6);
+    border-radius: 60px;
+    opacity: 0;
+}
+
+.btn-energy-ring.pulse {
+    animation: energyRingPulse 1.5s ease-out forwards;
+}
+
+@keyframes energyRingPulse {
+    0% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1);
+        border-width: 3px;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.8);
+        border-width: 1px;
+    }
+}
+
+.community-content {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+}
+
+/* ========== 슬로건 연출 ========== */
+.slogan-container {
+    position: relative;
+    margin-top: 100px;
+    margin-bottom: 15px;
+    margin-left: -100px;
+    opacity: 0;
+    transform: translateY(-40px) scale(0.8);
+    animation: sloganReveal 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+}
+
+.slogan-image {
+    max-width: 900px;
+    width: 128%;
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.6))
+            drop-shadow(0 0 40px rgba(0, 0, 0, 0.4))
+            drop-shadow(0 5px 20px rgba(255, 200, 100, 0.4));
+    position: relative;
+    z-index: 2;
+}
+
+/* 슬로건 뒤 글로우 효과 */
+.slogan-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 200%;
+    background: radial-gradient(ellipse at center,
+        rgba(255, 170, 50, 0.3) 0%,
+        rgba(255, 107, 0, 0.15) 30%,
+        transparent 70%);
+    filter: blur(20px);
+    z-index: 1;
+    opacity: 0;
+    animation: sloganGlowPulse 3s ease-in-out 1s infinite;
+}
+
+@keyframes sloganReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(-40px) scale(0.8);
+        filter: blur(10px);
+    }
+    50% {
+        filter: blur(0);
+    }
+    70% {
+        transform: translateY(5px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes sloganGlowPulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* 슬로건 스파클 효과 */
+.slogan-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.slogan-sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: sparkleFlash 2s ease-in-out infinite;
+}
+
+.slogan-sparkle::before,
+.slogan-sparkle::after {
+    content: '';
+    position: absolute;
+    background: white;
+}
+
+.slogan-sparkle::before {
+    width: 2px;
+    height: 14px;
+    left: 2px;
+    top: -4px;
+}
+
+.slogan-sparkle::after {
+    width: 14px;
+    height: 2px;
+    left: -4px;
+    top: 2px;
+}
+
+.slogan-sparkle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0.5s; }
+.slogan-sparkle:nth-child(2) { left: 85%; top: 30%; animation-delay: 1.2s; }
+.slogan-sparkle:nth-child(3) { left: 25%; top: 70%; animation-delay: 0.8s; }
+.slogan-sparkle:nth-child(4) { left: 70%; top: 60%; animation-delay: 1.8s; }
+.slogan-sparkle:nth-child(5) { left: 50%; top: 15%; animation-delay: 2.2s; }
+.slogan-sparkle:nth-child(6) { left: 90%; top: 75%; animation-delay: 1.5s; }
+
+@keyframes sparkleFlash {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+.logo-container {
+    margin-top: -95px;
+    margin-bottom: 0;
+    opacity: 0;
+    animation: communityFadeIn 0.8s ease-out 0.6s forwards;
+}
+
+.game-logo {
+    max-width: 350px;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 40px rgba(255, 107, 0, 0.5));
+    animation: logoGlowSoft 3s ease-in-out infinite;
+    transition: filter 1.5s ease-out, animation 0.5s ease-out;
+}
+
+@keyframes logoGlowSoft {
+    0%, 100% {
+        filter: drop-shadow(0 10px 30px rgba(255, 107, 0, 0.4));
+    }
+    50% {
+        filter: drop-shadow(0 15px 50px rgba(255, 107, 0, 0.7));
+    }
+}
+
+/* 버튼 호버 시 로고도 함께 빠른 맥동 + 녹색 전환 (JS에서 .glow-fast 클래스 추가) */
+.game-logo.glow-fast {
+    animation: logoGlowToGreen 1.5s ease-in-out infinite;
+    transition: filter 0.3s ease-in;
+}
+
+@keyframes logoGlowToGreen {
+    0%, 100% {
+        filter: drop-shadow(0 10px 30px rgba(255, 107, 0, 0.5))
+                drop-shadow(0 0 20px rgba(255, 107, 0, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 15px 50px rgba(3, 199, 90, 0.8))
+                drop-shadow(0 0 40px rgba(3, 199, 90, 0.5));
+    }
+}
+
+.community-title {
+    font-family: 'Tmon Monsori', 'Pretendard', sans-serif;
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    font-weight: 400;
+    margin-top: -25px;
+    margin-bottom: 40px;
+    background: linear-gradient(135deg, #03C75A, #00E676, #69F0AE, #00E676, #03C75A);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: communityFadeIn 0.8s ease-out 0.2s forwards, greenGradientShift 4s ease infinite;
+    opacity: 0;
+}
+
+@keyframes greenGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.community-description {
+    font-family: 'Gmarket Sans', 'Pretendard', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: -35px;
+    margin-bottom: 15px;
+    line-height: 1.8;
+    opacity: 0;
+    animation: communityFadeIn 0.8s ease-out 0.3s forwards;
+}
+
+/* 모바일 전용 줄바꿈 */
+.mobile-br {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .mobile-br {
+        display: block;
+    }
+}
+
+.highlight-text {
+    color: #ffaa00;
+    font-weight: 800;
+}
+
+@keyframes communityFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.community-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    opacity: 0;
+    animation: buttonAppear 1s ease-out 0.5s forwards, buttonPulseGlow 0.5s ease-out 1.8s;
+}
+
+@keyframes buttonAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes buttonPulseGlow {
+    0% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.5) drop-shadow(0 0 30px rgba(3, 199, 90, 0.8));
+    }
+    100% {
+        filter: brightness(1);
+    }
+}
+
+.community-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 22px 45px;
+    background: linear-gradient(135deg, #03C75A, #00A847);
+    border: none;
+    border-radius: 60px;
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, animation 0.3s ease;
+    box-shadow:
+        0 8px 30px rgba(3, 199, 90, 0.5),
+        0 0 40px rgba(3, 199, 90, 0.3),
+        0 0 80px rgba(3, 199, 90, 0.15);
+    position: relative;
+    overflow: visible;
+    /* 호흡 효과 - 로고 글로우(3s)와 동일한 타이밍 */
+    animation: btnBreathing 3s ease-in-out infinite;
+}
+
+/* 1. 호흡 효과 - 강화된 글로우 맥동 (transform 제거하여 마그네틱 효과와 충돌 방지) */
+@keyframes btnBreathing {
+    0%, 100% {
+        box-shadow:
+            0 8px 30px rgba(3, 199, 90, 0.5),
+            0 0 40px rgba(3, 199, 90, 0.3),
+            0 0 80px rgba(3, 199, 90, 0.15);
+    }
+    50% {
+        box-shadow:
+            0 12px 45px rgba(3, 199, 90, 0.7),
+            0 0 60px rgba(3, 199, 90, 0.5),
+            0 0 100px rgba(3, 199, 90, 0.25);
+    }
+}
+
+/* 2. 라이트 트레일 - 테두리를 따라 빛이 순환 */
+.community-btn::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 62px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 340deg,
+        rgba(255, 255, 255, 0.8) 350deg,
+        #03C75A 355deg,
+        rgba(255, 255, 255, 0.9) 360deg
+    );
+    z-index: -1;
+    animation: lightTrail 4s linear infinite;
+    opacity: 0.8;
+}
+
+.community-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 60px;
+    background: linear-gradient(135deg, #03C75A, #00A847);
+    z-index: 0;
+}
+
+@keyframes lightTrail {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+.community-btn:hover {
+    box-shadow:
+        0 15px 50px rgba(3, 199, 90, 0.7),
+        0 0 60px rgba(3, 199, 90, 0.5),
+        0 0 120px rgba(3, 199, 90, 0.3);
+    /* 호버 시 맥동 - 로고보다 약간 느리게 (체감상 동일) */
+    animation: btnBreathingFast 1.5s ease-in-out infinite;
+}
+
+/* 호버 시 빠른 맥동 효과 (transform 제거) */
+@keyframes btnBreathingFast {
+    0%, 100% {
+        box-shadow:
+            0 15px 50px rgba(3, 199, 90, 0.7),
+            0 0 60px rgba(3, 199, 90, 0.5),
+            0 0 120px rgba(3, 199, 90, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 20px 70px rgba(3, 199, 90, 0.9),
+            0 0 80px rgba(3, 199, 90, 0.7),
+            0 0 150px rgba(3, 199, 90, 0.4);
+    }
+}
+
+.btn-icon {
+    font-size: 1.8rem;
+    font-weight: 900;
+    background: #ffffff;
+    color: #03C75A;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.community-btn:hover .btn-icon {
+    transform: scale(1.1);
+}
+
+.btn-text {
+    letter-spacing: 0.05rem;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 600px) {
+    /* 모바일 섹션1: 중앙 캐릭터 더 밝게 (PC보다 투명 영역 넓게) */
+    .hero-overlay {
+        background:
+            radial-gradient(ellipse 80% 80% at 50% 45%, transparent 0%, rgba(0,0,0,0.4) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
+    }
+
+    /* 모바일용 섹션2 배경 이미지 (용량 절감) */
+    .community-section {
+        background:
+            linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%),
+            url('../resource/background2_m.jpg') center center / cover no-repeat;
+    }
+
+    /* ========== 모바일 성능 최적화 - 시퀀스 처리 ========== */
+    /* WebGL(Pixi) 물결 효과가 끝난 후 CSS 맥동 효과 시작 (GPU 부하 분산) */
+
+    /* 섹션1 로고: 기본 상태 (맥동 없음, 고정 그림자) */
+    .reveal-logo {
+        animation: logoReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        filter: drop-shadow(0 0 30px rgba(255, 107, 0, 0.5)) !important;
+    }
+
+    /* 섹션1 로고: 물결 효과 종료 후 맥동 시작 (JS에서 .start-pulse 추가) */
+    .reveal-logo.start-pulse {
+        animation: logoReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                   logoGlow 2.5s ease-in-out infinite !important;
+    }
+
+    /* 섹션2 로고: 기본 상태 (맥동 없음) */
+    .game-logo {
+        animation: none !important;
+        filter: drop-shadow(0 10px 30px rgba(255, 107, 0, 0.5)) !important;
+    }
+
+    /* 섹션2 로고: 맥동 활성화 (JS에서 .start-pulse 추가) */
+    .game-logo.start-pulse {
+        animation: logoGlowSoft 3s ease-in-out infinite !important;
+    }
+
+    /* 버튼 호버 시 로고 글로우 변경 */
+    .game-logo.glow-fast {
+        animation: none !important;
+        filter: drop-shadow(0 10px 30px rgba(3, 199, 90, 0.6)) !important;
+    }
+
+    /* 동심원 링: 기본 비활성화 */
+    .ring,
+    .ring-1,
+    .ring-2,
+    .ring-3,
+    .ring-4,
+    .ring-5 {
+        animation: none !important;
+        opacity: 0 !important;
+    }
+
+    /* 동심원 링: 물결 효과 종료 후 활성화 (JS에서 .start-pulse 추가) */
+    .ring.start-pulse { animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; opacity: 1 !important; }
+    .ring-1.start-pulse { animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; opacity: 1 !important; }
+    .ring-2.start-pulse { animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards !important; opacity: 1 !important; }
+    .ring-3.start-pulse { animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards !important; opacity: 1 !important; }
+    .ring-4.start-pulse { animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards !important; opacity: 1 !important; }
+    .ring-5.start-pulse { animation: ringExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards !important; opacity: 1 !important; }
+
+    /* 로고 뒤 글로우 오브: 기본 상태 (등장만, 맥동 없음) */
+    .glow-orb {
+        animation: orbAppear 1s ease-out 0.8s forwards !important;
+    }
+
+    /* 글로우 오브: 물결 효과 종료 후 맥동 시작 */
+    .glow-orb.start-pulse {
+        animation: orbAppear 1s ease-out 0.8s forwards, orbPulse 3s ease-in-out infinite 2s !important;
+    }
+    /* ========== 시퀀스 처리 끝 ========== */
+
+    .headline-letter {
+        height: 50px;
+    }
+
+    .g-letter {
+        height: 55px;
+    }
+
+    .headline-text {
+        padding: 15px 25px;
+    }
+
+    .space {
+        width: 8px;
+    }
+
+    .game-title-text {
+        font-size: 2rem;
+    }
+
+    .pre-register-date {
+        font-size: 1.3rem;
+    }
+
+    .subtitle {
+        font-size: 2.5rem;
+        letter-spacing: 0.2rem;
+    }
+
+    .community-btn {
+        padding: 15px 35px;
+        font-size: 1.2rem;
+        white-space: nowrap;
+    }
+
+    /* 작은 모바일 화면 (Galaxy S20 등 360px 이하) */
+    @media (max-width: 400px) {
+        .community-btn {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+    }
+
+    .community-features {
+        grid-template-columns: 1fr;
+    }
+
+    .game-logo {
+        max-width: 250px;
+    }
+
+    /* 모바일 슬로건 조정 */
+    .slogan-container {
+        margin-top: 50px;
+        margin-bottom: 5px;
+        margin-left: -47px;
+        z-index: 10;
+    }
+
+    .slogan-image {
+        max-width: none;
+        width: 80%;
+        filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.7))
+                drop-shadow(0 0 30px rgba(0, 0, 0, 0.5))
+                drop-shadow(0 3px 15px rgba(255, 200, 100, 0.4));
+    }
+
+    .logo-container {
+        margin-top: -10%;
+        z-index: 20;
+    }
+
+    .slogan-sparkle {
+        width: 4px;
+        height: 4px;
+    }
+
+    .slogan-sparkle::before {
+        width: 1px;
+        height: 10px;
+        left: 1.5px;
+        top: -3px;
+    }
+
+    .slogan-sparkle::after {
+        width: 10px;
+        height: 1px;
+        left: -3px;
+        top: 1.5px;
+    }
+
+    /* 모바일 연출 효과 조정 */
+    .reveal-logo {
+        max-width: 300px;
+    }
+
+    /* ========== 모바일 로고 박력 등장 최적화 ========== */
+    /* 로고 컨테이너 - 모바일에서 3D 최적화 */
+    .logo-animation-container {
+        max-width: 320px;
+        width: 90vw;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+    }
+
+    /* logo_01 - 모바일에서 scale/translateZ 축소 (성능 최적화) */
+    /* .loaded 클래스 추가 후 애니메이션 시작 (이미지 로딩 대기) */
+    .logo-base.loaded {
+        animation: logoBaseAppearMobile 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards !important;
+    }
+
+    @keyframes logoBaseAppearMobile {
+        0% {
+            opacity: 0;
+            transform: scale(3) translateZ(200px);
+            filter: brightness(2.5) blur(3px);
+        }
+        20% {
+            opacity: 1;
+            filter: brightness(2) blur(1px);
+        }
+        75% {
+            transform: scale(1.05) translateZ(10px);
+            filter: brightness(1.2) blur(0);
+        }
+        90% {
+            transform: scale(0.98) translateZ(-3px);
+            filter: brightness(1.1);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateZ(0);
+            filter: brightness(1);
+        }
+    }
+
+    /* CHANGE - 모바일: 부모-자식 구조 (부모=등장, 자식=회전) */
+    .logo-overlay-wrapper.step-appear {
+        animation: changeAppearWrapperMobile 0.5s cubic-bezier(0.2, 0, 0.2, 1) 0.15s forwards !important;
+    }
+
+    /* 모바일: 자식 애니메이션도 paused 상태로 미리 할당 */
+    .logo-overlay-inner {
+        animation: logoOverlaySpinInner 7s cubic-bezier(0.6, 0, 0.2, 1) 0s forwards paused !important;
+    }
+
+    /* 모바일용 부모 등장 애니메이션 - filter 제거 (preserve-3d 충돌 방지) */
+    @keyframes changeAppearWrapperMobile {
+        0% {
+            opacity: 0;
+            transform: translateX(-50%) scale(4) translateZ(300px);
+        }
+        15% {
+            opacity: 1;
+        }
+        65% {
+            transform: translateX(-50%) scale(1.1) translateZ(15px);
+        }
+        85% {
+            transform: translateX(-50%) scale(0.96) translateZ(-5px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(-50%) scale(1) translateZ(0);
+        }
+    }
+
+    /* perspective 최적화 - iOS Safari 호환 */
+    .logo-reveal {
+        -webkit-perspective: 800px;
+        perspective: 800px;
+    }
+
+    /* 플래시 효과 축소 - 모바일 성능 (JS에서 .start-flash로 트리거) */
+    .logo-flash-overlay.start-flash {
+        animation: logoFlash 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    }
+
+    /* 에너지 웨이브/링 성능 최적화 */
+    .energy-wave,
+    .ring {
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+    /* ========== 모바일 로고 박력 등장 최적화 끝 ========== */
+
+    .line-1 {
+        font-size: 1.8rem;
+    }
+
+    .line-2 {
+        font-size: 2.5rem;
+    }
+
+    .particle {
+        width: 3px;
+        height: 3px;
+    }
+
+    .energy-wave {
+        width: 60px;
+        height: 60px;
+    }
+
+    /* 모바일 버튼 맥동 효과 - 더 잘 보이도록 강화 */
+    .btn-energy-ring {
+        width: 105%;
+        height: 130%;
+        border-radius: 50px;
+        border-width: 3px;
+        border-color: rgba(3, 199, 90, 0.9);
+        box-shadow:
+            0 0 15px rgba(3, 199, 90, 0.6),
+            inset 0 0 10px rgba(3, 199, 90, 0.3);
+    }
+
+    @keyframes energyRingPulse {
+        0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            border-width: 3px;
+            box-shadow:
+                0 0 20px rgba(3, 199, 90, 0.8),
+                inset 0 0 15px rgba(3, 199, 90, 0.4);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.3);
+            border-width: 2px;
+            box-shadow:
+                0 0 30px rgba(3, 199, 90, 0.3),
+                inset 0 0 10px rgba(3, 199, 90, 0.1);
+        }
     }
 }

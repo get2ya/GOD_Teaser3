@@ -80,9 +80,9 @@ html, body {
 }
 
 .logo-animation {
-    width: 550px;
-    height: auto;
-    max-width: 90vw;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 비율 유지하며 화면에 맞춤 */
 }
 
 /* ========== 네이버 버튼 ========== */

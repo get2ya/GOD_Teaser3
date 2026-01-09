@@ -125,10 +125,6 @@ html, body {
    반응형: PC (1025px 이상)
    ============================================ */
 @media (min-width: 1025px) {
-    .logo-animation {
-        width: 550px;
-    }
-
     .bg-two img {
         height: 100vh;
     }
@@ -144,16 +140,11 @@ html, body {
 }
 
 /* ============================================
-   반응형: 타블릿 (601px ~ 1024px)
+   반응형: 태블릿 & 갤럭시 폴드 (601px ~ 1024px)
    ============================================ */
 @media (min-width: 601px) and (max-width: 1024px) {
-    .logo-animation {
-        width: 450px;
-        max-width: 70vw;
-    }
-
     .bg-two img {
-        height: 80vh;
+        height: 90vh;
     }
 
     .naver-btn {
@@ -170,13 +161,8 @@ html, body {
    반응형: 모바일 (600px 이하)
    ============================================ */
 @media (max-width: 600px) {
-    .logo-animation {
-        width: 320px;
-        max-width: 85vw;
-    }
-
     .bg-two img {
-        height: 70vh;
+        height: 80vh;
         opacity: 0.1;
     }
 
@@ -186,30 +172,6 @@ html, body {
     }
 
     .naver-btn img {
-        height: 38px;
-    }
-}
-
-/* ============================================
-   반응형: 소형 모바일 (400px 이하)
-   ============================================ */
-@media (max-width: 400px) {
-    .logo-animation {
-        width: 280px;
-        max-width: 90vw;
-    }
-
-    .bg-two img {
-        height: 60vh;
-        opacity: 0.08;
-    }
-
-    .naver-btn {
-        top: 12px;
-        right: 12px;
-    }
-
-    .naver-btn img {
-        height: 32px;
+        height: 36px;
     }
 }

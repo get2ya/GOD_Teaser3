@@ -82,7 +82,7 @@ html, body {
 .logo-animation {
     width: 100vw;
     height: 100vh;
-    object-fit: cover; /* 화면 꽉 채움 */
+    object-fit: contain; /* 비율 유지, 잘리지 않음 */
 }
 
 /* ========== 네이버 버튼 ========== */

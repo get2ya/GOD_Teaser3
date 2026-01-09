@@ -28,6 +28,7 @@ html, body {
 
 .background-group.visible {
     opacity: 1;
+    transition: opacity 0.5s ease, transform 0.1s ease-out;
 }
 
 .bg-layer {
@@ -49,13 +50,14 @@ html, body {
     background: url('../resource/background.jpg') center center / cover no-repeat;
     transform: translateZ(-100px) scale(1.1);
     filter: blur(8px);
-    transition: filter 0.8s ease;
+    transition: filter 0.8s ease, transform 0.1s ease-out;
 }
 
 /* big_change.png */
 .bg-change {
     z-index: 1;
     transform: translateZ(-50px) scale(1.05);
+    transition: transform 0.1s ease-out;
 }
 
 .bg-change img {
@@ -71,6 +73,7 @@ html, body {
 .bg-two {
     z-index: 2;
     transform: translateZ(0px);
+    transition: transform 0.1s ease-out;
 }
 
 .bg-two img {

@@ -7,25 +7,9 @@
 
     if (!mainVideo) return;
 
-    let loopReady = false;
-
-    // 루프 영상 미리 준비 (재생 후 일시정지)
-    function prepareLoopVideo() {
-        loopVideo.play().then(function() {
-            loopVideo.pause();
-            loopVideo.currentTime = 0;
-            loopReady = true;
-        }).catch(function() {
-            loopReady = true;
-        });
-    }
-
     function startSequence() {
         // Phase 1: 페이드인 + background/big_2 포커스
         bgGroup.classList.add('visible', 'phase1');
-
-        // 루프 영상 미리 준비
-        prepareLoopVideo();
 
         // Phase 2: big_change 포커스 (1.5초 후)
         setTimeout(function() {
@@ -40,30 +24,31 @@
 
             mainVideo.play().then(function() {
                 mainVideo.classList.add('playing');
-            }).catch(function(e) {
+                // 메인 영상 재생 시작하면 루프 영상도 뒤에서 미리 재생
+                loopVideo.play();
+            }).catch(function() {
                 mainVideo.classList.add('playing');
+                loopVideo.play();
             });
         }, 3000);
     }
 
-    // 메인 영상 끝나기 직전에 루프 영상 전환
-    mainVideo.addEventListener('timeupdate', function() {
-        // 영상 끝나기 0.05초 전에 전환
-        if (mainVideo.duration - mainVideo.currentTime < 0.05 && !loopVideo.classList.contains('playing')) {
-            // 루프 영상 먼저 보이게 하고
-            loopVideo.classList.add('playing');
-            loopVideo.play();
-            // 메인 영상 숨기기
-            mainVideo.classList.remove('playing');
-        }
-    });
-
-    // 메인 영상 끝나면 네이버 버튼 표시
+    // 메인 영상 끝나면 opacity 스위칭 (Gemini 방식)
     mainVideo.addEventListener('ended', function() {
-        if (naverBtn) {
-            naverBtn.classList.add('visible');
-        }
-        mainVideo.style.display = 'none';
+        // requestAnimationFrame으로 정확한 타이밍에 전환
+        requestAnimationFrame(function() {
+            loopVideo.classList.add('playing');  // 루프 보이기
+            mainVideo.classList.remove('playing');  // 메인 숨기기
+
+            if (naverBtn) {
+                naverBtn.classList.add('visible');
+            }
+
+            // 전환 후 메인 영상 제거하여 메모리 절약
+            setTimeout(function() {
+                mainVideo.style.display = 'none';
+            }, 500);
+        });
     });
 
     // 영상 프리로드 완료 후 시퀀스 시작

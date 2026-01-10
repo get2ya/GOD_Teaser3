@@ -28,15 +28,15 @@
 
         const timeLeft = mainVideo.duration - mainVideo.currentTime;
 
-        // 1. 영상 종료 0.4초 전: 뒤에 있는 루프 영상 미리 재생
+        // 1. 영상 종료 0.4초 전: 뒤에 있는 루프 영상 미리 재생 (아직 안보임)
         if (timeLeft <= 0.4 && !loopStarted) {
-            loopVideo.classList.add('visible');
             loopVideo.play();
             loopStarted = true;
         }
 
-        // 2. 영상 종료 0.15초 전: 앞의 메인 영상 투명화 (ended 전에 미리!)
+        // 2. 영상 종료 0.15초 전: 루프 페이드인 + 메인 페이드아웃 동시 시작
         if (timeLeft <= 0.15) {
+            loopVideo.classList.add('visible');
             mainVideo.classList.add('fade-out');
 
             if (naverBtn) {

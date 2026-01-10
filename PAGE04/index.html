@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 테스트 - 좌우 비교</title>
+    <link rel="icon" type="image/x-icon" href="../resource/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 배경 -->
+    <div class="background"></div>
+
+    <!-- 영상 컨테이너 -->
+    <div class="video-container">
+        <!-- 왼쪽: 메인 영상 -->
+        <div class="video-panel left-panel">
+            <h2>메인 영상</h2>
+            <div class="video-wrapper">
+                <video id="main-video" muted playsinline preload="auto">
+                    <source src="../resource/MV/play_Anim_preserve_mob.webm" type="video/webm">
+                </video>
+            </div>
+            <div class="controls">
+                <button id="main-play">재생</button>
+                <button id="main-pause">일시정지</button>
+                <button id="main-stop">중지</button>
+                <button id="main-restart">처음부터</button>
+            </div>
+            <div class="info" id="main-info">시간: 0.00s / 0.00s</div>
+        </div>
+
+        <!-- 오른쪽: 루프 영상 -->
+        <div class="video-panel right-panel">
+            <h2>루프 영상</h2>
+            <div class="video-wrapper">
+                <video id="loop-video" muted playsinline preload="auto">
+                    <source src="../resource/MV/play_Anim_preserve_loop.webm" type="video/webm">
+                </video>
+            </div>
+            <div class="controls">
+                <button id="loop-play">재생</button>
+                <button id="loop-pause">일시정지</button>
+                <button id="loop-stop">중지</button>
+                <button id="loop-restart">처음부터</button>
+            </div>
+            <div class="info" id="loop-info">시간: 0.00s / 0.00s</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

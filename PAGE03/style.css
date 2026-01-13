@@ -67,7 +67,7 @@ html, body {
     height: 100vh;
     width: auto;
     max-width: none;
-    opacity: 0.25;
+    opacity: 0.5;
     filter: brightness(1.2) contrast(1.1);
 }
 

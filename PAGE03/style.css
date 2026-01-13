@@ -95,14 +95,10 @@ html, body {
     opacity: 0;
 }
 
-/* 루프 영상 - 뒤에 배치, Hard Cut 전환 */
+/* 루프 영상 - 뒤에 배치, 처음부터 보임 (main이 위에서 가림) */
 .loop-video {
     z-index: 1;
-    /* transition 없음 - Hard Cut */
-}
-
-.loop-video.visible {
-    opacity: 1;
+    opacity: 1; /* 처음부터 보임 */
 }
 
 /* 메인 영상 - 앞에 배치, Hard Cut 전환 */

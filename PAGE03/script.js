@@ -1,4 +1,6 @@
-// 영상 제어 및 네이버 버튼 (Seamless Video Switch Strategy)
+// 영상 제어 및 네이버 버튼 (Seamless Video Switch Strategy v2)
+// loop-video는 처음부터 opacity: 1로 보임 (main-video가 위에서 가림)
+// main-video만 숨기면 loop-video가 자연스럽게 드러남
 (function() {
     const naverBtn = document.querySelector('.naver-btn');
     const mainVideo = document.getElementById('main-video');
@@ -20,12 +22,13 @@
             bgGroup.classList.add('visible');
         }
 
+        // main-video 보이기 + 재생
         mainVideo.classList.add('visible');
         mainVideo.play().catch(function() {});
 
-        // loop-video는 로드된 상태로 대기 (pause 상태, currentTime = 0)
+        // loop-video: 처음부터 재생 (CSS에서 이미 opacity: 1, main이 위에서 가림)
         loopVideo.currentTime = 0;
-        loopVideo.pause();
+        loopVideo.play().catch(function() {});
     }
 
     // Pre-Switch: 종료 직전에 미리 전환 (timeupdate 방식)
@@ -39,17 +42,13 @@
         if (remaining <= PRE_SWITCH_TIME) {
             switched = true;
 
-            // 1. loop-video 시작점 동기화 + 재생
+            // loop-video 시작점 동기화
             loopVideo.currentTime = 0;
-            loopVideo.play().catch(function() {});
 
-            // 2. loop-video 즉시 보이기 (Hard Cut)
-            loopVideo.classList.add('visible');
-
-            // 3. main-video 즉시 숨김 (Hard Cut, fade 없음)
+            // main-video만 숨기면 뒤의 loop-video가 보임 (깜빡임 없음)
             mainVideo.style.visibility = 'hidden';
 
-            // 4. 네이버 버튼 표시
+            // 네이버 버튼 표시
             if (naverBtn) {
                 naverBtn.classList.add('visible');
             }

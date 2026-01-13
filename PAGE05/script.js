@@ -6,28 +6,29 @@
 
     if (!valenVideo) return;
 
-    // 이미지 로드 완료 후 시작
+    // 영상 종료 시 네이버 버튼 표시
+    valenVideo.addEventListener('ended', function() {
+        if (naverBtn) {
+            naverBtn.classList.add('visible');
+        }
+    });
+
+    // 영상 로드 완료 후 시작
     function startSequence() {
         // 배경 페이드인
         if (bgGroup) {
             bgGroup.classList.add('visible');
         }
 
-        // 영상 페이드인
+        // 영상 페이드인 + 재생
         valenVideo.classList.add('visible');
-
-        // 네이버 버튼 표시 (1초 후)
-        setTimeout(function() {
-            if (naverBtn) {
-                naverBtn.classList.add('visible');
-            }
-        }, 1000);
+        valenVideo.play().catch(function() {});
     }
 
-    // 이미지가 이미 로드되었는지 확인
-    if (valenVideo.complete) {
+    // 영상이 이미 로드되었는지 확인
+    if (valenVideo.readyState >= 3) {
         startSequence();
     } else {
-        valenVideo.addEventListener('load', startSequence, { once: true });
+        valenVideo.addEventListener('canplaythrough', startSequence, { once: true });
     }
 })();

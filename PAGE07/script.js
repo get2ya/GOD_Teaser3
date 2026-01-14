@@ -62,8 +62,8 @@
     mainVideo.addEventListener('ended', function() {
         // A영상 숨김
         mainVideo.style.display = 'none';
-        // B영상 보이기 + 재생
-        loopVideo.classList.add('visible');
+        // B영상 즉시 보이기 + 재생 (페이드인 없음)
+        loopVideo.style.opacity = '1';
         loopVideo.currentTime = 0;
         loopVideo.play().catch(function() {});
     });

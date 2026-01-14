@@ -1,6 +1,6 @@
 // GOH 타이틀 영상 페이지 (A→B 루프 전환)
 // 배경 이미지 + 영상 모두 로드 후 시작
-// A영상 종료 후 B영상으로 교체
+// A영상 종료 시점에 B영상이 처음부터 시작되도록 타이밍 맞춤
 (function() {
     const naverBtn = document.querySelector('.naver-btn');
     const mainVideo = document.getElementById('main-video');
@@ -8,6 +8,9 @@
     const bgGroup = document.querySelector('.background-group');
 
     if (!mainVideo || !loopVideo) return;
+
+    // B영상 시작 여부 플래그
+    let loopStarted = false;
 
     // 배경 이미지 프리로드
     function preloadImages() {
@@ -41,23 +44,31 @@
         });
     }
 
-    // 영상 재생 시작
+    // A영상 재생 시작
     function startPlayback() {
         // A영상 보이게 + 재생
         mainVideo.classList.add('visible');
         mainVideo.play().catch(function() {});
-        // B영상도 미리 재생 (뒤에서 대기, 안 보임)
+        // B영상은 보이게 해두지만 아직 재생 안 함
         loopVideo.style.opacity = '1';
-        loopVideo.play().catch(function() {});
     }
 
-    // A영상 종료 1초 전에 버튼 표시
+    // A영상 타임라인 체크
     mainVideo.addEventListener('timeupdate', function() {
-        if (!mainVideo.duration) return;
+        if (!mainVideo.duration || !loopVideo.duration) return;
         const remaining = mainVideo.duration - mainVideo.currentTime;
 
+        // 버튼: 1초 전에 표시
         if (remaining <= 1 && naverBtn && !naverBtn.classList.contains('visible')) {
             naverBtn.classList.add('visible');
+        }
+
+        // B영상: A영상 종료 시점에 B가 처음부터 시작되도록 타이밍 맞춤
+        // A 남은 시간 <= B 전체 길이일 때 B 재생 시작
+        if (!loopStarted && remaining <= loopVideo.duration) {
+            loopStarted = true;
+            loopVideo.currentTime = 0;
+            loopVideo.play().catch(function() {});
         }
     });
 
@@ -65,6 +76,8 @@
     mainVideo.addEventListener('ended', function() {
         // A영상만 숨기면 뒤에서 재생 중인 B영상이 보임
         mainVideo.style.display = 'none';
+        // B영상 처음으로 리셋 (정확한 싱크)
+        loopVideo.currentTime = 0;
     });
 
     // 초기화: 모든 리소스 로드 후 시퀀스 시작

@@ -46,7 +46,7 @@ html, body {
     background: url('../resource/background.jpg') center center / cover no-repeat;
 }
 
-/* big_change.png */
+/* big_change.png - 가로 기준 */
 .bg-change {
     z-index: 1;
 }
@@ -58,7 +58,7 @@ html, body {
     opacity: 0.6;
 }
 
-/* big_2.png */
+/* big_2.png - 세로 기준, 화면 가득 */
 .bg-two {
     z-index: 2;
 }
@@ -86,8 +86,9 @@ html, body {
 }
 
 .video-content {
-    min-width: 100vw;
-    min-height: 100vh;
+    /* PC: 화면 채움 */
+    width: 100vw;
+    height: 100vh;
     object-fit: cover;
     object-position: center center;
     will-change: opacity;
@@ -138,7 +139,18 @@ html, body {
    반응형: PC (1025px 이상)
    ============================================ */
 @media (min-width: 1025px) {
+    .bg-change img {
+        width: 100%;
+        height: auto;
+    }
+
     .bg-two img {
+        height: 100vh;
+        width: auto;
+    }
+
+    .video-content {
+        width: 100vw;
         height: 100vh;
     }
 
@@ -153,12 +165,23 @@ html, body {
 }
 
 /* ============================================
-   반응형: 태블릿 & 갤럭시 폴드 (601px ~ 1024px)
+   반응형: 태블릿 & 폴드 펼침 (768px ~ 1024px)
    ============================================ */
-@media (min-width: 601px) and (max-width: 1024px) {
-    .bg-two img {
+@media (min-width: 768px) and (max-width: 1024px) {
+    .bg-change img {
         width: 100%;
         height: auto;
+    }
+
+    .bg-two img {
+        height: 100vh;
+        width: auto;
+        opacity: 0.5;
+    }
+
+    .video-content {
+        width: 100vw;
+        height: 100vh;
     }
 
     .naver-btn {
@@ -172,12 +195,28 @@ html, body {
 }
 
 /* ============================================
-   반응형: 모바일 (600px 이하)
+   반응형: 폴드 접힘 & 일반 모바일 (768px 미만)
    ============================================ */
-@media (max-width: 600px) {
+@media (max-width: 767px) {
+    /* big_change: 가로 기준 맞춤 */
+    .bg-change img {
+        width: 100%;
+        height: auto;
+    }
+
+    /* big_2: 숫자 2가 화면 가득 (세로 기준) */
     .bg-two img {
-        height: 80vh;
-        opacity: 0.1;
+        height: 100vh;
+        width: auto;
+        opacity: 0.4;
+    }
+
+    /* 영상: 로고 영역이 화면의 60% 정도 */
+    .video-content {
+        width: auto;
+        height: 60vh;
+        min-width: unset;
+        min-height: unset;
     }
 
     .naver-btn {

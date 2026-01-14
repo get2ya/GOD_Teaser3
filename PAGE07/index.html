@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE GOD OF HIGHSCHOOL CHANGE - A/B Test</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="THE GOD OF HIGHSCHOOL CHANGE">
+    <meta property="og:description" content="갓 오브 하이스쿨 체인지 티저 페이지">
+    <meta property="og:image" content="https://godteaser3.netlify.app/resource/logo_full.png">
+    <meta property="og:url" content="https://godteaser3.netlify.app/PAGE07/">
+
+    <link rel="icon" type="image/x-icon" href="../resource/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 배경 그룹 -->
+    <div class="background-group">
+        <!-- background.jpg -->
+        <div class="bg-layer bg-photo"></div>
+
+        <!-- big_change.png -->
+        <div class="bg-layer bg-change">
+            <img src="../resource/big_change.png" alt="">
+        </div>
+
+        <!-- big_2.png -->
+        <div class="bg-layer bg-two">
+            <img src="../resource/big_2.png" alt="">
+        </div>
+    </div>
+
+    <!-- 영상 컨테이너 -->
+    <div class="video-container">
+        <!-- 루프 영상 (B) - 뒤에 배치, 처음부터 보임 -->
+        <video class="video-content loop-video" id="loop-video" muted playsinline loop preload="auto">
+            <source src="../resource/MV/GOH_title_0114_B.webm" type="video/webm">
+        </video>
+        <!-- 메인 영상 (A) - 앞에 배치 -->
+        <video class="video-content main-video" id="main-video" muted playsinline preload="auto">
+            <source src="../resource/MV/GOH_title_0114_A.webm" type="video/webm">
+        </video>
+    </div>
+
+    <!-- 네이버 라운지 버튼 (녹색) -->
+    <a href="https://game.naver.com/lounge/GOD_highschool/home" target="_blank" class="naver-btn">
+        <img src="../resource/naverbttn.png" alt="네이버 라운지">
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>

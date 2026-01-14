@@ -1,0 +1,230 @@
+/* ========== 기본 리셋 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000000;
+}
+
+/* ========== 배경 그룹 ========== */
+.background-group {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.background-group.visible {
+    opacity: 1;
+}
+
+.bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* background.jpg */
+.bg-photo {
+    z-index: 0;
+    background: url('../resource/background.jpg') center center / cover no-repeat;
+}
+
+/* big_change.png - 가로 기준 */
+.bg-change {
+    z-index: 1;
+}
+
+.bg-change img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    opacity: 0.6;
+}
+
+/* big_2.png - 세로 기준, 화면 가득 */
+.bg-two {
+    z-index: 2;
+}
+
+.bg-two img {
+    height: 100vh;
+    width: auto;
+    max-width: none;
+    opacity: 0.5;
+    filter: brightness(1.2) contrast(1.1);
+}
+
+/* ========== 영상 컨테이너 ========== */
+.video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.video-content {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    object-position: center center;
+    will-change: opacity;
+}
+
+/* 루프 영상 (B) - 뒤에 배치, 처음부터 보임 */
+.loop-video {
+    z-index: 1;
+    opacity: 1;
+}
+
+/* 메인 영상 (A) - 앞에 배치 */
+.main-video {
+    z-index: 2;
+    opacity: 0;
+}
+
+.main-video.visible {
+    opacity: 1;
+}
+
+/* ========== 네이버 버튼 ========== */
+.naver-btn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1000;
+    opacity: 0;
+    transform: translate(-50%, 43vh); /* 초기: 더 아래에서 시작 */
+    pointer-events: none;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.naver-btn.visible {
+    opacity: 1;
+    transform: translate(-50%, 33vh); /* 최종: 중앙에서 33vh 아래 */
+    pointer-events: auto;
+}
+
+.naver-btn img {
+    height: 100px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.naver-btn:hover img {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+.naver-btn:active img {
+    transform: scale(0.98);
+}
+
+/* ============================================
+   반응형: PC (1025px 이상)
+   ============================================ */
+@media (min-width: 1025px) {
+    .bg-change img {
+        width: 100%;
+        height: auto;
+    }
+
+    .bg-two img {
+        height: 100vh;
+        width: auto;
+    }
+
+    .video-content {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .naver-btn img {
+        height: 100px;
+    }
+}
+
+/* ============================================
+   반응형: 태블릿 & 폴드 펼침 (768px ~ 1024px)
+   ============================================ */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .bg-change img {
+        width: 100%;
+        height: auto;
+    }
+
+    .bg-two img {
+        height: 100vh;
+        width: auto;
+        opacity: 0.5;
+    }
+
+    .video-content {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .naver-btn img {
+        height: 93px;
+    }
+}
+
+/* ============================================
+   반응형: 폴드 접힘 & 일반 모바일 (768px 미만)
+   ============================================ */
+@media (max-width: 767px) {
+    /* big_change: 가로 기준 맞춤 */
+    .bg-change img {
+        width: 100%;
+        height: auto;
+    }
+
+    /* big_2: 세로 기준 70% */
+    .bg-two img {
+        height: 70vh;
+        width: auto;
+        opacity: 0.4;
+    }
+
+    /* 영상: 로고 영역이 화면의 60% 정도 */
+    .video-content {
+        width: auto;
+        height: 60vh;
+        min-width: unset;
+        min-height: unset;
+    }
+
+    /* 모바일: 중앙에서 25vh 아래 */
+    .naver-btn.visible {
+        transform: translate(-50%, 25vh);
+    }
+
+    .naver-btn img {
+        height: 75px;
+    }
+}

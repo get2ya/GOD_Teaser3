@@ -204,10 +204,10 @@ html, body {
         height: auto;
     }
 
-    /* big_2: 숫자 2가 화면 가득 (세로 기준) */
+    /* big_2: 가로 기준 맞춤 (세로 모바일에서 overflow 방지) */
     .bg-two img {
-        height: 100vh;
-        width: auto;
+        width: 100%;
+        height: auto;
         opacity: 0.4;
     }
 

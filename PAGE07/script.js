@@ -47,6 +47,9 @@
         });
     }
 
+    // B영상 시작 타이밍 (A영상 종료 몇 초 전)
+    const B_START_BEFORE = 1; // 1초 전
+
     // 정밀 타이밍 체크 (requestAnimationFrame)
     function checkTiming() {
         if (!mainVideo.duration || !loopVideo.duration) {
@@ -62,10 +65,11 @@
             naverBtn.classList.add('visible');
         }
 
-        // B영상: A영상 종료 시점에 B가 처음부터 시작되도록 타이밍 맞춤
-        if (!loopStarted && remaining <= loopVideo.duration) {
+        // B영상: A영상 종료 1초 전에 시작, B영상 8초(duration-1) 위치부터
+        if (!loopStarted && remaining <= B_START_BEFORE) {
             loopStarted = true;
-            loopVideo.currentTime = 0;
+            // B영상을 끝에서 1초 전 위치(8초)부터 시작
+            loopVideo.currentTime = loopVideo.duration - B_START_BEFORE;
             loopVideo.play().catch(function() {});
         }
 

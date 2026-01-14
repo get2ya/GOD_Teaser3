@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 테스트 - A/B 비교</title>
+    <link rel="icon" type="image/x-icon" href="../resource/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 배경 -->
+    <div class="background"></div>
+
+    <!-- 영상 컨테이너 -->
+    <div class="video-container">
+        <!-- 왼쪽: A 영상 -->
+        <div class="video-panel left-panel">
+            <h2>A 영상</h2>
+            <div class="video-wrapper">
+                <video id="video-a" muted playsinline preload="auto">
+                    <source src="../resource/MV/GOH_title_0114_A.webm" type="video/webm">
+                </video>
+            </div>
+            <div class="controls">
+                <button id="a-play">재생</button>
+                <button id="a-pause">일시정지</button>
+                <button id="a-stop">중지</button>
+                <button id="a-restart">처음부터</button>
+            </div>
+            <div class="info" id="a-info">시간: 0.00s / 0.00s</div>
+        </div>
+
+        <!-- 오른쪽: B 영상 -->
+        <div class="video-panel right-panel">
+            <h2>B 영상</h2>
+            <div class="video-wrapper">
+                <video id="video-b" muted playsinline preload="auto">
+                    <source src="../resource/MV/GOH_title_0114_B.webm" type="video/webm">
+                </video>
+            </div>
+            <div class="controls">
+                <button id="b-play">재생</button>
+                <button id="b-pause">일시정지</button>
+                <button id="b-stop">중지</button>
+                <button id="b-restart">처음부터</button>
+            </div>
+            <div class="info" id="b-info">시간: 0.00s / 0.00s</div>
+        </div>
+    </div>
+
+    <!-- 동시 컨트롤 -->
+    <div class="sync-controls">
+        <button id="sync-play">동시 재생</button>
+        <button id="sync-pause">동시 일시정지</button>
+        <button id="sync-restart">동시 처음부터</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

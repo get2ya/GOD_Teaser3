@@ -39,9 +39,11 @@
         mainVideo.load();
     }
 
-    // 영상 종료 시 네이버 버튼 표시
-    mainVideo.addEventListener('ended', function() {
-        if (naverBtn) {
+    // 영상 종료 1초 전 네이버 버튼 표시
+    mainVideo.addEventListener('timeupdate', function() {
+        if (!mainVideo.duration) return;
+        const remaining = mainVideo.duration - mainVideo.currentTime;
+        if (remaining <= 1 && naverBtn && !naverBtn.classList.contains('visible')) {
             naverBtn.classList.add('visible');
         }
     });

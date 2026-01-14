@@ -1,5 +1,6 @@
 // GOH 타이틀 영상 페이지 (A→B 루프 전환)
 // 배경 이미지 + 영상 모두 로드 후 시작
+// A영상 종료 후 B영상으로 교체
 (function() {
     const naverBtn = document.querySelector('.naver-btn');
     const mainVideo = document.getElementById('main-video');
@@ -7,12 +8,6 @@
     const bgGroup = document.querySelector('.background-group');
 
     if (!mainVideo || !loopVideo) return;
-
-    // 전환 플래그
-    let switched = false;
-
-    // Pre-Switch 타이밍 (종료 몇 초 전에 전환할지)
-    const PRE_SWITCH_TIME = 0.05;
 
     // 배경 이미지 프리로드
     function preloadImages() {
@@ -46,35 +41,31 @@
         });
     }
 
-    // 영상 재생 시작
+    // A영상 재생 시작
     function startPlayback() {
-        // 둘 다 보이게
+        // A영상만 보이게 + 재생
         mainVideo.classList.add('visible');
-        loopVideo.classList.add('visible');
-        // 재생
         mainVideo.play().catch(function() {});
-        loopVideo.currentTime = 0;
-        loopVideo.play().catch(function() {});
     }
 
-    // Pre-Switch: A영상 종료 직전에 B로 전환
+    // A영상 종료 1초 전에 버튼 표시
     mainVideo.addEventListener('timeupdate', function() {
-        if (switched) return;
         if (!mainVideo.duration) return;
-
         const remaining = mainVideo.duration - mainVideo.currentTime;
 
-        // 1초 전에 버튼 표시
         if (remaining <= 1 && naverBtn && !naverBtn.classList.contains('visible')) {
             naverBtn.classList.add('visible');
         }
+    });
 
-        // 0.05초 전에 전환
-        if (remaining <= PRE_SWITCH_TIME) {
-            switched = true;
-            loopVideo.currentTime = 0;
-            mainVideo.style.visibility = 'hidden';
-        }
+    // A영상 종료 시 B영상으로 교체
+    mainVideo.addEventListener('ended', function() {
+        // A영상 숨김
+        mainVideo.style.display = 'none';
+        // B영상 보이기 + 재생
+        loopVideo.classList.add('visible');
+        loopVideo.currentTime = 0;
+        loopVideo.play().catch(function() {});
     });
 
     // 초기화: 모든 리소스 로드 후 시퀀스 시작

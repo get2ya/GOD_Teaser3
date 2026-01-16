@@ -49,9 +49,11 @@
 
     // B영상 시작 타이밍 (A영상 종료 몇 초 전) - 1프레임 = 약 0.033초
     const B_START_BEFORE = 0.033;
+    // 네이버 버튼 + dim 오버레이 시작 타이밍 (A영상 종료 몇 초 전)
+    const BUTTON_START_BEFORE = 0.5;
 
-    // 어둡기 오버레이 활성화 여부
-    let dimStarted = false;
+    // 플래그
+    let buttonStarted = false;
 
     // 정밀 타이밍 체크 (requestAnimationFrame)
     function checkTiming() {
@@ -62,11 +64,18 @@
 
         const remaining = mainVideo.duration - mainVideo.currentTime;
 
-        // 어둡기 오버레이: 비활성화
-        // if (!dimStarted && remaining <= 1 && dimOverlay) {
-        //     dimStarted = true;
-        //     dimOverlay.classList.add('active');
-        // }
+        // 네이버 버튼 + dim 오버레이: A영상 종료 0.5초 전에 시작
+        if (!buttonStarted && remaining <= BUTTON_START_BEFORE) {
+            buttonStarted = true;
+            console.log('=== 네이버 버튼 + dim 오버레이 시작 ===');
+            console.log('A영상 remaining:', remaining.toFixed(3));
+            if (dimOverlay) {
+                dimOverlay.classList.add('active');
+            }
+            if (naverBtn) {
+                naverBtn.classList.add('visible');
+            }
+        }
 
         // B영상: A영상 종료 0.033초(1프레임) 전에 시작
         if (!loopStarted && remaining <= B_START_BEFORE) {
@@ -74,6 +83,8 @@
             console.log('=== B영상 시작 ===');
             console.log('A영상 currentTime:', mainVideo.currentTime.toFixed(3));
             console.log('A영상 remaining:', remaining.toFixed(3));
+            // B영상 opacity 1로 변경 (이제서야 보이게)
+            loopVideo.style.opacity = '1';
             // B영상을 끝에서 0.033초 전 위치부터 시작
             loopVideo.currentTime = loopVideo.duration - B_START_BEFORE;
             loopVideo.play().catch(function() {});
@@ -91,8 +102,8 @@
         // A영상 보이게 + 재생
         mainVideo.classList.add('visible');
         mainVideo.play().catch(function() {});
-        // B영상은 뒤 레이어에서 보이는 상태로 대기 (seamless 전환 위해)
-        loopVideo.style.opacity = '1';
+        // B영상은 초기에 숨겨둠 (A종료 0.033초 전에 opacity 1로 변경)
+        // loopVideo.style.opacity는 checkTiming에서 처리
         // 정밀 타이밍 체크 시작
         animFrameId = requestAnimationFrame(checkTiming);
     }

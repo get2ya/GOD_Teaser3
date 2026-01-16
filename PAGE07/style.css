@@ -113,7 +113,7 @@ html, body {
 }
 
 .video-dim-overlay.active {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .loop-video.visible {
@@ -156,12 +156,14 @@ html, body {
 
 @keyframes btnPulse {
     0%, 100% {
-        transform: scale(1);
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+        opacity: 1;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))
+                drop-shadow(0 0 0px rgba(30, 200, 100, 0));
     }
     50% {
-        transform: scale(1.03);
-        filter: drop-shadow(0 4px 16px rgba(255, 255, 255, 0.15));
+        opacity: 0.92;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))
+                drop-shadow(0 0 20px rgba(30, 200, 100, 0.6));
     }
 }
 

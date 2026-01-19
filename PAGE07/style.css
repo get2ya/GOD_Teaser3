@@ -251,12 +251,11 @@ html, body {
         opacity: 0.4;
     }
 
-    /* 영상: 로고 영역이 화면의 60% 정도 */
+    /* 영상: 화면 가득 채움 (세로 영상 대응) */
     .video-content {
-        width: auto;
-        height: 60vh;
-        min-width: unset;
-        min-height: unset;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
     }
 
     /* 모바일: 중앙에서 25vh 아래 */

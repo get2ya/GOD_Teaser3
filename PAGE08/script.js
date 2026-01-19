@@ -10,6 +10,7 @@
     const dimOverlay = document.getElementById('video-dim-overlay');
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMask = document.getElementById('loading-mask');
+    const loadingPercent = document.getElementById('loading-percent');
 
     if (!mainVideo || !loopVideo) return;
 
@@ -86,6 +87,10 @@
             // 마스크 width를 100%에서 0%로 줄임 (좌→우로 이미지가 드러남)
             if (loadingMask) {
                 loadingMask.style.width = (100 - percent) + '%';
+            }
+            // 퍼센트 텍스트 업데이트
+            if (loadingPercent) {
+                loadingPercent.textContent = Math.floor(percent) + '%';
             }
             console.log('로딩 진행률:', percent.toFixed(1) + '%');
         }

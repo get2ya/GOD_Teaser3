@@ -68,6 +68,22 @@
     50% { opacity: 1; }
 }
 
+/* 로딩 퍼센트 텍스트 */
+.loading-percent {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 20px rgba(100, 200, 255, 0.8),
+                 0 0 40px rgba(100, 200, 255, 0.5),
+                 0 0 60px rgba(100, 200, 255, 0.3);
+    letter-spacing: 4px;
+}
+
 /* ========== 기본 리셋 ========== */
 * {
     margin: 0;

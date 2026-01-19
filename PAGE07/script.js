@@ -18,10 +18,17 @@
         return /Android/i.test(ua) || (/iPhone|iPod/i.test(ua) && !/iPad/i.test(ua));
     }
 
-    // 모바일이면 영상 소스 변경
+    // 모바일이면 영상 소스 변경 (iOS 호환성: source 태그 제거 후 src 설정 + load() 필수)
     if (isMobile()) {
+        // 기존 source 태그 제거
+        mainVideo.innerHTML = '';
+        loopVideo.innerHTML = '';
+        // src 직접 설정
         mainVideo.src = '../resource/MV/GOH_title_verti_A.webm';
         loopVideo.src = '../resource/MV/GOH_title_verti_A_loop.webm';
+        // iOS에서는 load() 호출 필수
+        mainVideo.load();
+        loopVideo.load();
         console.log('=== 모바일 감지: 세로 영상으로 변경 ===');
     }
 
@@ -50,14 +57,30 @@
         });
     }
 
-    // 영상 로드 대기
-    function waitForVideo(video) {
+    // 영상 로드 대기 (타임아웃 및 에러 핸들링 포함)
+    function waitForVideo(video, timeoutMs) {
+        timeoutMs = timeoutMs || 15000; // 기본 15초
         return new Promise(function(resolve) {
             if (video.readyState >= 3) {
                 resolve();
-            } else {
-                video.addEventListener('canplaythrough', resolve, { once: true });
+                return;
             }
+
+            var timeout = setTimeout(function() {
+                console.warn('영상 로드 타임아웃:', video.id);
+                resolve(); // 타임아웃이어도 계속 진행
+            }, timeoutMs);
+
+            video.addEventListener('canplaythrough', function() {
+                clearTimeout(timeout);
+                resolve();
+            }, { once: true });
+
+            video.addEventListener('error', function(e) {
+                clearTimeout(timeout);
+                console.error('영상 로드 에러:', video.id, e);
+                resolve(); // 에러여도 계속 진행 (배경은 보여야 함)
+            }, { once: true });
         });
     }
 
@@ -162,16 +185,18 @@
         // }
     });
 
-    // 초기화: 배경 + A영상 로드 후 시작 (B영상은 preload="auto"로 백그라운드 다운로드)
-    Promise.all([
-        preloadImages(),
-        waitForVideo(mainVideo)
-    ]).then(function() {
-        // 배경 페이드인
+    // 초기화: 배경 먼저 표시, 영상은 별도로 대기 (iOS 안전장치)
+    // 배경 이미지 로드 완료 시 즉시 표시 (영상 로드 실패해도 배경은 보임)
+    preloadImages().then(function() {
         if (bgGroup) {
             bgGroup.classList.add('visible');
+            console.log('=== 배경 이미지 로드 완료 ===');
         }
+    });
 
+    // A영상 로드 대기 후 재생 시작 (B영상은 preload="auto"로 백그라운드 다운로드)
+    waitForVideo(mainVideo, 15000).then(function() {
+        console.log('=== A영상 로드 완료 (또는 타임아웃) ===');
         // 배경 페이드인 완료 후(0.7초) 영상 시작
         setTimeout(startPlayback, 700);
     });

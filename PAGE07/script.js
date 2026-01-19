@@ -11,6 +11,18 @@
 
     if (!mainVideo || !loopVideo) return;
 
+    // 모바일 감지 (안드로이드 크롬)
+    function isMobile() {
+        return /Android/i.test(navigator.userAgent) && /Chrome/i.test(navigator.userAgent);
+    }
+
+    // 모바일이면 영상 소스 변경
+    if (isMobile()) {
+        mainVideo.src = '../resource/MV/GOH_title_verti_A.webm';
+        loopVideo.src = '../resource/MV/GOH_title_verti_A_loop.webm';
+        console.log('=== 모바일 감지: 세로 영상으로 변경 ===');
+    }
+
     // 플래그
     let loopStarted = false;
     let animFrameId = null;

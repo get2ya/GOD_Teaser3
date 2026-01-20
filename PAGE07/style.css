@@ -101,19 +101,25 @@ html, body {
     /* transition 없음 - 즉시 전환 */
 }
 
-/* 어둡기 오버레이 (버튼 등장과 함께 스무드하게 어두워짐) */
+/* 어둡기 오버레이 (버튼 등장과 함께 비네팅 효과) */
 .video-dim-overlay {
     position: absolute;
     width: 100vw;
     height: 100vh;
     z-index: 5;
-    background: rgba(0, 0, 0, 0);
     pointer-events: none;
+    /* 초기: 투명 */
+    background: radial-gradient(ellipse at center, transparent 0%, transparent 100%);
     transition: background 2s ease-out;
 }
 
 .video-dim-overlay.active {
-    background: rgba(0, 0, 0, 0.15);
+    /* 중앙은 투명, 가장자리로 갈수록 어두워짐 */
+    background: radial-gradient(ellipse at center,
+        transparent 0%,
+        transparent 30%,
+        rgba(0, 0, 0, 0.08) 50%,
+        rgba(0, 0, 0, 0.15) 100%);
 }
 
 .loop-video.visible {

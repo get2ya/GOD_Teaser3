@@ -18,18 +18,33 @@
         return /Android/i.test(ua) || (/iPhone|iPod/i.test(ua) && !/iPad/i.test(ua));
     }
 
-    // 모바일이면 영상 소스 변경 (iOS 호환성: source 태그 제거 후 src 설정 + load() 필수)
+    // iOS 감지 (iPhone/iPod만, iPad 제외)
+    function isIOS() {
+        const ua = navigator.userAgent;
+        return /iPhone|iPod/i.test(ua) && !/iPad/i.test(ua);
+    }
+
+    // 모바일이면 영상 소스 변경
     if (isMobile()) {
         // 기존 source 태그 제거
         mainVideo.innerHTML = '';
         loopVideo.innerHTML = '';
-        // src 직접 설정
-        mainVideo.src = '../resource/MV/GOH_title_verti_A.webm';
-        loopVideo.src = '../resource/MV/GOH_title_verti_A_loop.webm';
+
+        if (isIOS()) {
+            // iOS: HEVC MOV 사용 (Safari 호환)
+            mainVideo.src = '../resource/MV/GOH_title_verti_B_1.mov';
+            loopVideo.src = '../resource/MV/GOH_title_verti_B_loop_1.mov';
+            console.log('=== iOS 감지: HEVC MOV 영상으로 변경 ===');
+        } else {
+            // Android: WebM VP9 사용
+            mainVideo.src = '../resource/MV/GOH_title_verti_A.webm';
+            loopVideo.src = '../resource/MV/GOH_title_verti_A_loop.webm';
+            console.log('=== Android 감지: WebM 영상으로 변경 ===');
+        }
+
         // iOS에서는 load() 호출 필수
         mainVideo.load();
         loopVideo.load();
-        console.log('=== 모바일 감지: 세로 영상으로 변경 ===');
     }
 
     // 플래그

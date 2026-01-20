@@ -266,4 +266,32 @@ html, body {
     .naver-btn img {
         height: 61px;
     }
+
+    /* iOS 모바일: 맥동 효과 간소화 (drop-shadow 2개 → 1개, 주기 느리게) */
+    @supports (-webkit-touch-callout: none) {
+        .naver-btn.pulsing img {
+            animation: btnPulseSimple 3.5s ease-in-out infinite;
+        }
+
+        @keyframes btnPulseSimple {
+            0%, 100% {
+                opacity: 1;
+                filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+            }
+            50% {
+                opacity: 0.95;
+                filter: drop-shadow(0 0 15px rgba(30, 200, 100, 0.5));
+            }
+        }
+
+        /* iOS: dim 오버레이 transition 단축 */
+        .video-dim-overlay {
+            transition: background 1s ease-out;
+        }
+
+        /* iOS: will-change로 GPU 레이어 분리 힌트 */
+        .naver-btn {
+            will-change: transform, opacity;
+        }
+    }
 }

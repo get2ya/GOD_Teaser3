@@ -1,7 +1,8 @@
 // GOH 타이틀 영상 페이지 (A→B 루프 전환)
 // 배경 이미지 + 영상 모두 로드 후 시작
 // A영상 종료 시점에 B영상이 처음부터 시작되도록 타이밍 맞춤
-// requestAnimationFrame으로 정밀 타이밍 (약 16ms 간격)
+// PC/Android: requestAnimationFrame (정밀 타이밍)
+// iOS: timeupdate 이벤트 (성능 최적화)
 (function() {
     const naverBtn = document.querySelector('.naver-btn');
     const mainVideo = document.getElementById('main-video');
@@ -23,6 +24,9 @@
         const ua = navigator.userAgent;
         return /iPhone|iPod/i.test(ua) && !/iPad/i.test(ua);
     }
+
+    // iOS 여부 캐싱 (매번 UA 체크 방지)
+    const _isIOS = isIOS();
 
     // 모바일이면 영상 소스 변경
     if (isMobile()) {
@@ -101,10 +105,10 @@
 
     // B영상 시작 타이밍 (A영상 종료 몇 초 전)
     // iOS는 seek/play 동기화가 느려서 더 여유있는 타이밍 필요
-    const B_START_BEFORE = isIOS() ? 0.15 : 0.033;
+    const B_START_BEFORE = _isIOS ? 0.15 : 0.033;
     // 네이버 버튼 + dim 오버레이 시작 타이밍 (A영상 종료 몇 초 전)
     // iOS는 애니메이션 오버헤드가 커서 B영상 시작과 시간적 분리 필요
-    const BUTTON_START_BEFORE = isIOS() ? 1.2 : 0.5;
+    const BUTTON_START_BEFORE = _isIOS ? 1.5 : 0.5;
 
     // 플래그
     let buttonStarted = false;
@@ -161,12 +165,12 @@
             // B영상을 끝에서 B_START_BEFORE초 전 위치로 이동
             loopVideo.currentTime = loopVideo.duration - B_START_BEFORE;
 
-            if (isIOS()) {
+            if (_isIOS) {
                 // iOS: seek 완료 후 opacity 변경 + play (동기화 문제 방지)
                 loopVideo.addEventListener('seeked', function() {
                     loopVideo.style.opacity = '1';
                     loopVideo.play().catch(function() {});
-                    console.log('B영상 시작 위치 (iOS seeked):', loopVideo.currentTime.toFixed(3));
+                    console.log('[iOS] B영상 seeked 완료:', loopVideo.currentTime.toFixed(3));
                 }, { once: true });
             } else {
                 // Windows/Android: 기존 방식 (즉시 실행)
@@ -187,30 +191,82 @@
         // A영상 보이게 + 재생
         mainVideo.classList.add('visible');
         mainVideo.play().catch(function() {});
-        // B영상은 초기에 숨겨둠 (A종료 0.033초 전에 opacity 1로 변경)
-        // loopVideo.style.opacity는 checkTiming에서 처리
-        // 정밀 타이밍 체크 시작
-        animFrameId = requestAnimationFrame(checkTiming);
+
+        if (_isIOS) {
+            // iOS: timeupdate 이벤트 방식 (rAF보다 성능 부하 낮음)
+            console.log('[iOS] timeupdate 이벤트 방식 사용');
+            mainVideo.addEventListener('timeupdate', handleTimeUpdateIOS);
+        } else {
+            // Windows/Android: requestAnimationFrame (정밀 타이밍)
+            animFrameId = requestAnimationFrame(checkTiming);
+        }
+    }
+
+    // iOS용 timeupdate 핸들러 (rAF 대체)
+    function handleTimeUpdateIOS() {
+        if (!mainVideo.duration || !loopVideo.duration) return;
+
+        const remaining = mainVideo.duration - mainVideo.currentTime;
+
+        // 네이버 버튼 시작
+        if (!buttonStarted && remaining <= BUTTON_START_BEFORE) {
+            buttonStarted = true;
+            console.log('[iOS] 버튼 시작, remaining:', remaining.toFixed(3));
+            if (dimOverlay) dimOverlay.classList.add('active');
+            if (naverBtn) {
+                naverBtn.classList.add('visible');
+                // iOS: 맥동 효과 지연 (애니메이션 오버헤드 분산)
+                setTimeout(function() {
+                    naverBtn.classList.add('pulsing');
+                }, 3000);
+            }
+        }
+
+        // B영상 시작
+        if (!loopStarted && remaining <= B_START_BEFORE) {
+            if (loopVideo.readyState >= 3) {
+                startLoopVideoIOS();
+            } else {
+                loopVideo.addEventListener('canplay', function() {
+                    if (!loopStarted) startLoopVideoIOS();
+                }, { once: true });
+            }
+        }
+    }
+
+    // iOS용 B영상 시작 (별도 함수로 분리)
+    function startLoopVideoIOS() {
+        loopStarted = true;
+        console.log('[iOS] B영상 시작 준비');
+
+        // iOS: 처음부터 재생 (seek 오버헤드 제거)
+        loopVideo.currentTime = 0;
+        loopVideo.addEventListener('seeked', function() {
+            loopVideo.style.opacity = '1';
+            loopVideo.play().catch(function() {});
+            console.log('[iOS] B영상 재생 시작');
+        }, { once: true });
     }
 
     // A영상 종료 시 즉시 숨김 → B영상이 보임
     mainVideo.addEventListener('ended', function() {
         // 타이밍 체크 중지
-        if (animFrameId) {
+        if (_isIOS) {
+            mainVideo.removeEventListener('timeupdate', handleTimeUpdateIOS);
+            console.log('[iOS] timeupdate 리스너 제거');
+        } else if (animFrameId) {
             cancelAnimationFrame(animFrameId);
         }
+
         // 타임라인 로그
         console.log('=== A영상 ended 이벤트 ===');
         console.log('A영상 duration:', mainVideo.duration.toFixed(3));
         console.log('A영상 currentTime:', mainVideo.currentTime.toFixed(3));
         console.log('B영상 currentTime:', loopVideo.currentTime.toFixed(3));
+
         // A영상 즉시 숨김 (B영상은 이미 뒤에서 재생 중)
         mainVideo.style.display = 'none';
         console.log('>>> A영상 숨김 처리 완료 <<<');
-        // 네이버 버튼: 비활성화
-        // if (naverBtn) {
-        //     naverBtn.classList.add('visible');
-        // }
     });
 
     // 초기화: 배경 먼저 표시, 영상은 별도로 대기 (iOS 안전장치)

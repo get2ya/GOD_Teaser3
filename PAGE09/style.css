@@ -1,0 +1,227 @@
+/* ========== 기본 리셋 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+/* ========== 배경 그룹 ========== */
+.background-group {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+
+.background-group.visible {
+    opacity: 1;
+}
+
+.bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.bg-photo {
+    z-index: 0;
+    background: url('./resource/Img/bg_main.webp') center center / cover no-repeat;
+}
+
+.bg-change {
+    z-index: 1;
+}
+
+.bg-change img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    opacity: 0.6;
+}
+
+.bg-two {
+    z-index: 2;
+}
+
+.bg-two img {
+    height: 100vh;
+    width: auto;
+    max-width: none;
+    opacity: 0.5;
+    filter: brightness(1.2) contrast(1.1);
+}
+
+/* ========== 영상 컨테이너 ========== */
+.video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.video-content {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    object-position: center center;
+    will-change: opacity;
+}
+
+.loop-video {
+    z-index: 1;
+    opacity: 0;
+}
+
+.video-dim-overlay {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 5;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0);
+    transition: background 2s ease-out;
+}
+
+.video-dim-overlay.active {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.main-video {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.main-video.visible {
+    opacity: 1;
+}
+
+/* ========== 네이버 버튼 ========== */
+.naver-btn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1000;
+    opacity: 0;
+    transform: translate(-50%, 45vh);
+    pointer-events: none;
+    transition: opacity 2s ease-out, transform 2s ease-out;
+}
+
+.naver-btn.visible {
+    opacity: 1;
+    transform: translate(-50%, 33vh);
+    pointer-events: auto;
+}
+
+.naver-btn.pulsing img {
+    animation: btnPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes btnPulse {
+    0%, 100% {
+        opacity: 1;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))
+                drop-shadow(0 0 0px rgba(30, 200, 100, 0));
+    }
+    50% {
+        opacity: 0.92;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))
+                drop-shadow(0 0 20px rgba(30, 200, 100, 0.6));
+    }
+}
+
+.naver-btn img {
+    height: 81px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.naver-btn:hover img {
+    transform: scale(1.02);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 0 30px rgba(30, 200, 100, 0.8));
+}
+
+.naver-btn:active img {
+    transform: scale(0.98);
+}
+
+/* ========== 반응형: 태블릿 (768px ~ 1024px) ========== */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .bg-two img {
+        opacity: 0.5;
+    }
+
+    .naver-btn img {
+        height: 76px;
+    }
+}
+
+/* ========== 반응형: 모바일 (768px 미만) ========== */
+@media (max-width: 767px) {
+    .bg-two img {
+        height: 70vh;
+        opacity: 0.4;
+    }
+
+    .naver-btn.visible {
+        transform: translate(-50%, 25vh);
+    }
+
+    .naver-btn img {
+        height: 61px;
+    }
+
+    /* iOS 최적화 */
+    @supports (-webkit-touch-callout: none) {
+        .naver-btn.pulsing img {
+            animation: btnPulseSimple 3.5s ease-in-out infinite;
+        }
+
+        @keyframes btnPulseSimple {
+            0%, 100% {
+                opacity: 1;
+                filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+            }
+            50% {
+                opacity: 0.95;
+                filter: drop-shadow(0 0 15px rgba(30, 200, 100, 0.5));
+            }
+        }
+
+        .video-dim-overlay {
+            transition: background 1s ease-out;
+        }
+
+        .naver-btn {
+            will-change: transform, opacity;
+        }
+    }
+}

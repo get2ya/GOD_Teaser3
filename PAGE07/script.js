@@ -196,6 +196,9 @@
             // iOS: timeupdate 이벤트 방식 (rAF보다 성능 부하 낮음)
             console.log('[iOS] timeupdate 이벤트 방식 사용');
             mainVideo.addEventListener('timeupdate', handleTimeUpdateIOS);
+
+            // iOS: B영상 디코더 워밍업 (A영상 시작 1초 후)
+            setTimeout(preplayLoopVideoIOS, 1000);
         } else {
             // Windows/Android: requestAnimationFrame (정밀 타이밍)
             animFrameId = requestAnimationFrame(checkTiming);
@@ -239,13 +242,28 @@
         loopStarted = true;
         console.log('[iOS] B영상 시작 준비');
 
-        // iOS: 처음부터 재생 (seek 오버헤드 제거)
+        // iOS: 이미 preplay로 준비되어 있으면 즉시 보이게
+        loopVideo.style.opacity = '1';
+        loopVideo.play().catch(function() {});
+        console.log('[iOS] B영상 재생 시작');
+    }
+
+    // iOS: B영상 미리 재생 후 일시정지 (디코더 워밍업)
+    function preplayLoopVideoIOS() {
+        if (!_isIOS) return;
+
+        // B영상 처음부터 재생 준비
         loopVideo.currentTime = 0;
-        loopVideo.addEventListener('seeked', function() {
-            loopVideo.style.opacity = '1';
-            loopVideo.play().catch(function() {});
-            console.log('[iOS] B영상 재생 시작');
-        }, { once: true });
+        loopVideo.play().then(function() {
+            // 0.1초 재생 후 일시정지 (디코더 활성화)
+            setTimeout(function() {
+                loopVideo.pause();
+                loopVideo.currentTime = 0;
+                console.log('[iOS] B영상 preplay 완료 (디코더 워밍업)');
+            }, 100);
+        }).catch(function() {
+            console.log('[iOS] B영상 preplay 실패 (autoplay 제한)');
+        });
     }
 
     // A영상 종료 시 즉시 숨김 → B영상이 보임
